@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人作品集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #E06336;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #FF5E48;
+        }
+
+        /* 导航栏 */
+        nav {
+            display: flex;
+            justify-content: flex-end;
+            padding: 40px 60px;
+            gap: 50px;
+            z-index: 100;
+        }
+
+        nav a {
+            color: #FFFDFE;
+            text-decoration: none;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover {
+            transform: translateY(-2px);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #FFFDFE;
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* 主内容区 */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        /* 书架容器 */
+        .bookshelf-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            perspective: 1200px;
+        }
+
+        /* 书籍容器 - 横向轮播 */
+        .books-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 900px;
+            height: 600px;
+            transform-style: preserve-3d;
+        }
+
+        /* 箭头按钮 */
+        .arrow-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 50;
+            padding: 20px;
+            background: transparent;
+            border: none;
+        }
+
+        .arrow-btn:hover {
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        .arrow-btn svg {
+            width: 64px;
+            height: 64px;
+            fill: #000000;
+        }
+
+        .arrow-btn.left {
+            left: 40px;
+        }
+
+        .arrow-btn.right {
+            right: 40px;
+        }
+
+        /* 卡片 - 竖向长方形 */
+        .book {
+            width: 360px;
+            height: 520px;
+            position: absolute;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border-radius: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* 卡片激活状态 - 居中显示 */
+        .book.active {
+            transform: translateX(-50%) scale(1) translateZ(100px);
+            z-index: 100;
+            opacity: 1;
+        }
+
+        /* 左边卡片 */
+        .book.prev {
+            transform: translateX(-150%) scale(0.85) translateZ(-200px) rotateY(15deg);
+            z-index: 50;
+            opacity: 0.6;
+            filter: blur(2px);
+        }
+
+        .book.prev-2 {
+            transform: translateX(-250%) scale(0.7) translateZ(-400px) rotateY(25deg);
+            z-index: 40;
+            opacity: 0.3;
+            filter: blur(4px);
+        }
+
+        .book.prev-3 {
+            transform: translateX(-350%) scale(0.55) translateZ(-600px) rotateY(35deg);
+            z-index: 30;
+            opacity: 0.1;
+            filter: blur(6px);
+        }
+
+        /* 右边卡片 */
+        .book.next {
+            transform: translateX(50%) scale(0.85) translateZ(-200px) rotateY(-15deg);
+            z-index: 50;
+            opacity: 0.6;
+            filter: blur(2px);
+        }
+
+        .book.next-2 {
+            transform: translateX(150%) scale(0.7) translateZ(-400px) rotateY(-25deg);
+            z-index: 40;
+            opacity: 0.3;
+            filter: blur(4px);
+        }
+
+        .book.next-3 {
+            transform: translateX(250%) scale(0.55) translateZ(-600px) rotateY(-35deg);
+            z-index: 30;
+            opacity: 0.1;
+            filter: blur(6px);
+        }
+
+        /* 轮播指示器 */
+        .carousel-indicators {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 60;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 94, 72, 0.3);
+            border: 2px solid rgba(255, 94, 72, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: #FF5E48;
+            border-color: #FF5E48;
+            transform: scale(1.2);
+        }
+
+        .indicator:hover {
+            background: rgba(255, 94, 72, 0.6);
+        }
+
+        /* 卡片内容 - 竖向分布 */
+        .book-face {
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 253, 254, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* 卡片背景图片 */
+        .book[data-id="0"] .book-face {
+            background-image: url('https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/ae11a571-ac2c-4468-a721-4011f9c5e073/a3c29c6fd00d3fadabf91dfc519fb02b.jpg?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1779109443&Signature=RrNarkGAxgBozpmFPXnEEveXaN0=') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-color: transparent !important;
+        }
+
+        .book[data-id="1"] .book-face {
+            background-image: url('https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/ae11a571-ac2c-4468-a721-4011f9c5e073/4d79d585eecbc01c6b996b04dc6d1c37.jpg?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1779109345&Signature=wPcBEgUn9xO6eRKv5SnKLk1s0wY=') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-color: transparent !important;
+        }
+
+        .book[data-id="2"] .book-face {
+            background-image: url('https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/ae11a571-ac2c-4468-a721-4011f9c5e073/cdc3c4d3b3f77a7057d53b71b06d4f72.jpg?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1779109378&Signature=P8+rH2zgjh0sR0CKUDrzwul6Ma8=') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-color: transparent !important;
+        }
+
+        .book[data-id="3"] .book-face {
+            background-image: url('https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/ae11a571-ac2c-4468-a721-4011f9c5e073/698e0b34c9e58f1760e0243726e3bae4.jpg?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1779109508&Signature=ow3v7G1U6xewVKGqkS2VCTcT7Kg=') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-color: transparent !important;
+        }
+
+        /* 01卡片中的数字和标题颜色为白色 */
+        .book:nth-child(1) .book-face .number,
+        .book:nth-child(1) .book-face h3 {
+            color: #FFFDFE;
+        }
+
+        /* 02卡片中的数字和标题颜色 */
+        .book:nth-child(2) .book-face .number,
+        .book:nth-child(2) .book-face h3 {
+            color: #E06336;
+        }
+
+        .book-face .number {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            font-size: 96px;
+            color: #000000;
+            font-weight: bold;
+            letter-spacing: 2px;
+            line-height: 1;
+            padding-top: 0;
+        }
+
+        .book-face h3 {
+            position: absolute;
+            right: 40px;
+            top: 40px;
+            font-size: 32px;
+            color: #000000;
+            font-weight: bold;
+            letter-spacing: 4px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            line-height: 1;
+            padding-top: 0;
+            z-index: 10;
+        }
+
+        /* 不同卡片的阴影效果 */
+        .book.active .book-face {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 底部社交区 */
+        .social-footer {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            padding: 50px 0;
+        }
+
+        .social-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 94, 72, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 94, 72, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #FF5E48;
+            font-size: 20px;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.2) translateY(-8px);
+            background: rgba(255, 94, 72, 0.2);
+            box-shadow: 0 8px 25px rgba(255, 94, 72, 0.3);
+        }
+
+        .social-icon img {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) saturate(100%);
+        }
+
+        /* 社交图标SVG */
+        .icon-svg {
+            width: 22px;
+            height: 22px;
+            fill: #FFFDFE;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" data-book="0">个人简介</a>
+        <a href="#" data-book="1">作品一览</a>
+        <a href="#" data-book="2">联系方式</a>
+        <a href="#" data-book="3">技能特长</a>
+        <a href="#" data-book="4">项目案例</a>
+    </nav>
+
+    <main>
+        <div class="bookshelf-container">
+            <!-- 左箭头按钮 -->
+            <button class="arrow-btn left" id="prevBtn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+
+            <!-- 右箭头按钮 -->
+            <button class="arrow-btn right" id="nextBtn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+
+            <div class="books-container">
+                        <!-- 卡片1：个人简介 -->
+                <div class="book active" data-id="0">
+                    <div class="book-face" style="background-image: url('images/01-card.jpg'); background-size: cover; background-position: center; background-color: transparent;">
+                        <div class="number">01</div>
+                        <h3>个人简介</h3>
+                    </div>
+                </div>
+
+                <!-- 卡片2：作品一览 -->
+                <div class="book next" data-id="1">
+                    <div class="book-face" style="background-image: url('images/02-card.jpg'); background-size: cover; background-position: center; background-color: transparent;">
+                        <div class="number">02</div>
+                        <h3>作品一览</h3>
+                    </div>
+                </div>
+
+                <!-- 卡片3：联系方式 -->
+                <div class="book next-2" data-id="2">
+                    <div class="book-face" style="background-image: url('images/03-card.jpg'); background-size: cover; background-position: center; background-color: transparent;">
+                        <div class="number">03</div>
+                        <h3>联系方式</h3>
+                    </div>
+                </div>
+
+                <!-- 卡片4：技能特长 -->
+                <div class="book" data-id="3">
+                    <div class="book-face" style="background-image: url('images/04-card.jpg'); background-size: cover; background-position: center; background-color: transparent;">
+                        <div class="number">04</div>
+                        <h3>技能特长</h3>
+                    </div>
+                </div>
+
+                <!-- 卡片5：项目案例 -->
+                <div class="book" data-id="4">
+                    <div class="book-face">
+                        <div class="number">05</div>
+                        <h3>项目案例</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 轮播指示器 -->
+            <div class="carousel-indicators">
+                <div class="indicator active" data-index="0"></div>
+                <div class="indicator" data-index="1"></div>
+                <div class="indicator" data-index="2"></div>
+                <div class="indicator" data-index="3"></div>
+                <div class="indicator" data-index="4"></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="social-footer">
+        <div class="social-icon" data-url="https://www.xiaohongshu.com">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm0-8h-2V7h2v2zm4 8h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+        </div>
+        <div class="social-icon" data-url="mailto:example@email.com">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+        </div>
+        <div class="social-icon" data-url="#">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        const books = document.querySelectorAll('.book');
+        const navLinks = document.querySelectorAll('nav a');
+        const socialIcons = document.querySelectorAll('.social-icon');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const indicators = document.querySelectorAll('.indicator');
+
+        let currentIndex = 0;
+        const totalBooks = books.length;
+
+        // 更新轮播状态
+        function updateCarousel() {
+            books.forEach((book, index) => {
+                // 移除所有状态类
+                book.classList.remove('active', 'prev', 'prev-2', 'prev-3', 'next', 'next-2', 'next-3');
+
+                const distance = index - currentIndex;
+
+                if (distance === 0) {
+                    // 当前激活卡片
+                    book.classList.add('active');
+                    book.style.opacity = '1';
+                } else if (distance === -1) {
+                    book.classList.add('prev');
+                    book.style.opacity = '';
+                } else if (distance === -2) {
+                    book.classList.add('prev-2');
+                    book.style.opacity = '';
+                } else if (distance === -3) {
+                    book.classList.add('prev-3');
+                    book.style.opacity = '';
+                } else if (distance === 1) {
+                    book.classList.add('next');
+                    book.style.opacity = '';
+                } else if (distance === 2) {
+                    book.classList.add('next-2');
+                    book.style.opacity = '';
+                } else if (distance === 3) {
+                    book.classList.add('next-3');
+                    book.style.opacity = '';
+                } else {
+                    // 其他卡片隐藏
+                    book.classList.add('hidden');
+                    book.style.opacity = '0';
+                }
+            });
+
+            // 更新指示器
+            indicators.forEach((indicator, index) => {
+                if (index === currentIndex) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+        }
+
+        // 导航到指定索引
+        function navigateTo(index) {
+            currentIndex = index;
+            updateCarousel();
+        }
+
+        // 下一张
+        function nextCard() {
+            currentIndex = (currentIndex + 1) % totalBooks;
+            updateCarousel();
+        }
+
+        // 上一张
+        function prevCard() {
+            currentIndex = (currentIndex - 1 + totalBooks) % totalBooks;
+            updateCarousel();
+        }
+
+        // 导航栏点击事件
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const bookId = parseInt(link.getAttribute('data-book'));
+                navigateTo(bookId);
+            });
+        });
+
+        // 箭头按钮点击事件
+        prevBtn.addEventListener('click', prevCard);
+        nextBtn.addEventListener('click', nextCard);
+
+        // 轮播指示器点击事件
+        indicators.forEach(indicator => {
+            indicator.addEventListener('click', () => {
+                const index = parseInt(indicator.getAttribute('data-index'));
+                navigateTo(index);
+            });
+        });
+
+        // 点击卡片切换
+        books.forEach((book, index) => {
+            book.addEventListener('click', (e) => {
+                navigateTo(index);
+            });
+        });
+
+        // 社交图标点击事件
+        socialIcons.forEach(icon => {
+            icon.addEventListener('click', () => {
+                const url = icon.getAttribute('data-url');
+                if (url && url !== '#') {
+                    window.open(url, '_blank');
+                }
+            });
+        });
+
+        // 键盘事件
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                nextCard();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                prevCard();
+            }
+        });
+
+        // 鼠标滚轮事件
+        let isScrolling = false;
+        document.addEventListener('wheel', (e) => {
+            if (isScrolling) return;
+            isScrolling = true;
+
+            if (e.deltaX > 0) {
+                // 向右滚动，下一个
+                nextCard();
+            } else if (e.deltaX < 0) {
+                // 向左滚动，上一个
+                prevCard();
+            }
+
+            setTimeout(() => {
+                isScrolling = false;
+            }, 500);
+        }, { passive: true });
+
+        // 初始化
+        updateCarousel();
+    </script>
+</body>
+</html>
