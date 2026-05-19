@@ -784,22 +784,10 @@
                                 </div>
                             </div>
                             <div class="achievements">
-                                <div class="achievement-item">
-                                    <div class="achievement-bar" style="height: 120px;"></div>
-                                    <div class="achievement-label">连续7年奖学金</div>
-                                </div>
-                                <div class="achievement-item">
-                                    <div class="achievement-bar" style="height: 100px;"></div>
-                                    <div class="achievement-label">TOP%10专业排名</div>
-                                </div>
-                                <div class="achievement-item">
-                                    <div class="achievement-bar" style="height: 80px;"></div>
-                                    <div class="achievement-label">同济大学暑期优秀学员</div>
-                                </div>
-                                <div class="achievement-item">
-                                    <div class="achievement-bar" style="height: 90px;"></div>
-                                    <div class="achievement-label">外国建筑史讲师</div>
-                                </div>
+                                <div class="profile-tab">连续7年奖学金</div>
+                                <div class="profile-tab">TOP%10专业排名</div>
+                                <div class="profile-tab">同济大学暑期优秀学员</div>
+                                <div class="profile-tab">外国建筑史讲师</div>
                             </div>
                             <div class="timeline-item">
                                 <div class="timeline-dot"></div>
@@ -959,9 +947,21 @@
             width: 90%;
             max-width: 1200px;
             height: 75vh;
+            margin-top: 80px;
             display: flex;
             gap: 60px;
-            margin-top: 80px;
+        }
+
+        .profile-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 250px;
+        }
+
+        .profile-content-wrapper {
+            flex: 1;
+            overflow: hidden;
         }
 
         .profile-tabs {
@@ -972,27 +972,29 @@
         }
 
         .profile-tab {
-            padding: 20px 120px;
-            background-color: #F17446;
-            border-radius: 12px;
             color: #FFFDFE;
-            font-size: 20px;
-            font-weight: 500;
+            text-decoration: none;
+            font-size: 18px;
             cursor: pointer;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(244, 70, 44, 0.3);
-            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 500;
+            letter-spacing: 1px;
             text-align: center;
-            writing-mode: horizontal-tb;
+            padding: 5px 12px;
+            background-color: #F17446;
+            border-radius: 8px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .profile-tab:hover {
+            background-color: #000000;
         }
 
         .profile-tab.active {
             background-color: #000000;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        .profile-tab:hover {
-            transform: translateY(-3px);
         }
 
         .profile-content-wrapper {
@@ -1003,8 +1005,9 @@
         .profile-content {
             display: none;
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(0);
             transition: all 0.4s ease;
+            margin-top: -20px;
         }
 
         .profile-content.active {
@@ -1014,13 +1017,14 @@
         }
 
         .profile-section {
-            padding: 40px;
+            padding: 30px 30px 30px 40px;
         }
 
         .profile-section h2 {
             font-size: 32px;
-            color: #FFFDFE;
+            color: #000000;
             margin-bottom: 20px;
+            margin-top: 0;
             font-weight: bold;
         }
 
@@ -1028,17 +1032,32 @@
             font-size: 18px;
             color: #FFFDFE;
             line-height: 1.8;
+            margin-top: 0;
+        }
+
+        .about-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 0;
+        }
+
+        .profile-text {
+            font-size: 18px;
+            color: #000000;
+            line-height: 1.8;
         }
 
         /* About Cards样式 */
         .about-cards {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            display: flex;
+            flex-wrap: wrap;
             gap: 30px;
             margin-top: 30px;
         }
 
         .about-card {
+            flex: 0 0 calc(50% - 15px);
             background: rgba(255, 253, 254, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 253, 254, 0.3);
@@ -1055,21 +1074,26 @@
         .card-title {
             font-size: 20px;
             font-weight: bold;
-            color: #FFFDFE;
+            color: #000000;
             margin-bottom: 12px;
+            text-align: left;
         }
 
         .card-desc {
             font-size: 16px;
-            color: #FFFDFE;
+            color: #000000;
             opacity: 0.9;
             line-height: 1.6;
+            text-align: left;
         }
 
         /* Timeline样式 */
         .timeline {
             margin-top: 30px;
-            padding-left: 30px;
+            padding-left: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
         }
 
         .timeline-item {
@@ -1077,53 +1101,54 @@
             align-items: flex-start;
             position: relative;
             padding-bottom: 30px;
+            min-width: calc(50% - 20px);
         }
 
         .timeline-item::before {
             content: '';
             position: absolute;
             left: 6px;
-            top: 20px;
+            top: 6px;
             bottom: 0;
             width: 2px;
-            background-color: #FFFDFE;
-        }
-
-        .timeline-item:last-child::before {
-            display: none;
+            background-color: #000000;
         }
 
         .timeline-dot {
             width: 14px;
             height: 14px;
-            background-color: #FFFDFE;
+            background-color: #000000;
             border-radius: 50%;
             flex-shrink: 0;
             margin-right: 20px;
-            margin-top: 5px;
         }
 
         .timeline-content {
             flex: 1;
+            min-width: 0;
+            text-align: left;
         }
 
         .timeline-title {
             font-size: 22px;
             font-weight: bold;
-            color: #FFFDFE;
+            color: #000000;
             margin-bottom: 8px;
+            text-align: left;
         }
 
         .timeline-date {
             font-size: 16px;
-            color: #FFFDFE;
+            color: #000000;
             margin-bottom: 8px;
+            text-align: left;
         }
 
         .timeline-desc {
             font-size: 16px;
-            color: #FFFDFE;
+            color: #000000;
             opacity: 0.9;
+            text-align: left;
         }
 
         .timeline-detail {
@@ -1132,28 +1157,31 @@
 
         .detail-item {
             margin-bottom: 15px;
+            width: 100%;
         }
 
         .detail-title {
             font-size: 18px;
             font-weight: bold;
-            color: #FFFDFE;
+            color: #000000;
             margin-bottom: 5px;
+            text-align: left;
         }
 
         .detail-desc {
             font-size: 16px;
-            color: #FFFDFE;
+            color: #000000;
             opacity: 0.9;
             line-height: 1.6;
+            text-align: left;
         }
 
         /* Achievements样式 */
         .achievements {
             display: flex;
-            gap: 20px;
-            margin-top: 30px;
-            padding: 20px 0;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px 0;
             flex-wrap: wrap;
         }
 
@@ -1161,18 +1189,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            min-width: 80px;
         }
 
         .achievement-bar {
-            width: 40px;
+            width: 30px;
             background: linear-gradient(to top, rgba(255, 253, 254, 0.3), rgba(255, 253, 254, 0.8));
             border-radius: 4px;
         }
 
         .achievement-label {
             font-size: 14px;
-            color: #FFFDFE;
+            color: #000000;
             text-align: center;
             opacity: 0.9;
         }
@@ -1229,6 +1258,7 @@
 
             .profile-section h2 {
                 font-size: 24px;
+                color: #000000;
             }
 
             .profile-text {
