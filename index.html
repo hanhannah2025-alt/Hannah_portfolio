@@ -783,12 +783,6 @@
                                     <div class="timeline-desc">设计学 硕士学位</div>
                                 </div>
                             </div>
-                            <div class="achievements">
-                                <div class="profile-tab">连续7年奖学金</div>
-                                <div class="profile-tab">TOP%10专业排名</div>
-                                <div class="profile-tab">同济大学暑期优秀学员</div>
-                                <div class="profile-tab">外国建筑史讲师</div>
-                            </div>
                             <div class="timeline-item">
                                 <div class="timeline-dot"></div>
                                 <div class="timeline-content">
@@ -989,10 +983,6 @@
             justify-content: center;
         }
 
-        .profile-tab:hover {
-            background-color: #000000;
-        }
-
         .profile-tab.active {
             background-color: #000000;
         }
@@ -1092,8 +1082,19 @@
             margin-top: 30px;
             padding-left: 0;
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 40px;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 7px;
+            bottom: 7px;
+            width: 2px;
+            background-color: #000000;
         }
 
         .timeline-item {
@@ -1101,18 +1102,8 @@
             align-items: flex-start;
             position: relative;
             padding-bottom: 30px;
-            min-width: calc(50% - 20px);
         }
 
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 6px;
-            top: 6px;
-            bottom: 0;
-            width: 2px;
-            background-color: #000000;
-        }
 
         .timeline-dot {
             width: 14px;
