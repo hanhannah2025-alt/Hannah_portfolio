@@ -1005,8 +1005,8 @@
                         </div>
                         <div class="portfolio-breakdown">
                             <h3>业务拆解</h3>
-                            <img src="images/电商客服workflow的业务拆解1.jpg" alt="业务拆解1" style="width: 100%; border-radius: 12px;">
-                            <img src="images/电商客服workflow的业务拆解2.jpg" alt="业务拆解2" style="width: 100%; border-radius: 12px; margin-top: 20px;">
+                            <img src="images/电商客服workflow的业务拆解1.jpg" alt="业务拆解1" style="width: 100%; border-radius: 12px; cursor: pointer;" onclick="event.stopPropagation(); document.getElementById('lightboxImg').src=this.src; document.getElementById('imageLightbox').style.display='flex';">
+                            <img src="images/电商客服workflow的业务拆解2.jpg" alt="业务拆解2" style="width: 100%; border-radius: 12px; margin-top: 20px; cursor: pointer;" onclick="event.stopPropagation(); document.getElementById('lightboxImg').src=this.src; document.getElementById('imageLightbox').style.display='flex';">
                         </div>
                         <div class="portfolio-breakdown">
                             <h3>工作流</h3>
@@ -1684,24 +1684,46 @@
         const imageLightbox = document.getElementById('imageLightbox');
         const lightboxImg = document.getElementById('lightboxImg');
 
-        // 点击overlay中的图片放大
-        document.addEventListener('click', (e) => {
-            const target = e.target;
-            if (target.tagName === 'IMG' && (target.closest('#profileOverlay') || target.closest('#portfolioOverlay'))) {
-                lightboxImg.src = target.src;
-                imageLightbox.style.display = 'flex';
-            }
-        });
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            imageLightbox.style.display = 'flex';
+        }
 
-        // 点击灯箱关闭
-        imageLightbox.addEventListener('click', () => {
+        function closeLightbox() {
             imageLightbox.style.display = 'none';
             lightboxImg.src = '';
+        }
+
+        // 点击作品一览中的图片放大
+        if (portfolioOverlay) {
+            portfolioOverlay.addEventListener('click', (e) => {
+                if (e.target.tagName === 'IMG') {
+                    e.stopPropagation();
+                    openLightbox(e.target.src);
+                }
+            });
+        }
+
+        // 点击个人简介中的图片放大
+        if (profileOverlay) {
+            profileOverlay.addEventListener('click', (e) => {
+                if (e.target.tagName === 'IMG') {
+                    e.stopPropagation();
+                    openLightbox(e.target.src);
+                }
+            });
+        }
+
+        // 点击灯箱关闭
+        imageLightbox.addEventListener('click', (e) => {
+            if (e.target !== lightboxImg) {
+                closeLightbox();
+            }
         });
     </script>
 
-    <div id="imageLightbox" class="image-lightbox" style="display:none;">
-        <img src="" alt="放大查看" id="lightboxImg">
+    <div id="imageLightbox" class="image-lightbox" style="display:none;" onclick="this.style.display='none'; document.getElementById('lightboxImg').src='';">
+        <img src="" alt="放大查看" id="lightboxImg" onclick="event.stopPropagation();">
     </div>
 </body>
 </html>
