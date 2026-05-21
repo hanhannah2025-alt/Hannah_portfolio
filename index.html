@@ -942,16 +942,16 @@
                                 <p class="detail-title">· 长期记忆</p>
                             </div>
                             <div class="portfolio-preview">
-                                <img src="images/沈亦宸.png" alt="沈亦宸" style="width: 100%; border-radius: 12px; cursor: pointer;" onclick="event.stopPropagation(); document.getElementById('lightboxImg').src=this.src; document.getElementById('imageLightbox').style.display='flex';">
+                                <img src="images/沈亦宸.png" alt="沈亦宸" style="width: 100%; border-radius: 12px; cursor: pointer;" onclick="event.stopPropagation(); openLightbox(this.src);">
                             </div>
                         </div>
                         <div class="portfolio-breakdown">
                             <h3>业务拆解</h3>
-                            <img src="images/情绪陪伴智能体.jpg" alt="业务拆解" style="width: 100%; border-radius: 12px; cursor: pointer;" onclick="event.stopPropagation(); document.getElementById('lightboxImg').src=this.src; document.getElementById('imageLightbox').style.display='flex';">
+                            <img src="images/情绪陪伴智能体.jpg" alt="业务拆解" style="width: 100%; border-radius: 12px; cursor: pointer;" onclick="event.stopPropagation(); openLightbox(this.src);">
                         </div>
                         <div class="portfolio-breakdown">
                             <h3>工作流</h3>
-                            <img src="images/intimate_coversition_flow__2_1.jpeg" alt="工作流" style="width: 100%; border-radius: 12px; cursor: pointer;" onclick="event.stopPropagation(); document.getElementById('lightboxImg').src=this.src; document.getElementById('imageLightbox').style.display='flex';">
+                            <img src="images/intimate_coversition_flow__2_1.jpeg" alt="工作流" style="width: 100%; border-radius: 12px; cursor: pointer;" onclick="event.stopPropagation(); openLightbox(this.src, true);">
                         </div>
                     </div>
                 </div>
@@ -1005,12 +1005,12 @@
                         </div>
                         <div class="portfolio-breakdown">
                             <h3>业务拆解</h3>
-                            <img src="images/电商客服workflow的业务拆解1.jpg" alt="业务拆解1" style="width: 100%; border-radius: 12px; cursor: pointer;" onclick="event.stopPropagation(); document.getElementById('lightboxImg').src=this.src; document.getElementById('imageLightbox').style.display='flex';">
-                            <img src="images/电商客服workflow的业务拆解2.jpg" alt="业务拆解2" style="width: 100%; border-radius: 12px; margin-top: 20px; cursor: pointer;" onclick="event.stopPropagation(); document.getElementById('lightboxImg').src=this.src; document.getElementById('imageLightbox').style.display='flex';">
+                            <img src="images/电商客服workflow的业务拆解1.jpg" alt="业务拆解1" style="width: 100%; border-radius: 12px; cursor: pointer;" onclick="event.stopPropagation(); openLightbox(this.src);">
+                            <img src="images/电商客服workflow的业务拆解2.jpg" alt="业务拆解2" style="width: 100%; border-radius: 12px; margin-top: 20px; cursor: pointer;" onclick="event.stopPropagation(); openLightbox(this.src);">
                         </div>
                         <div class="portfolio-breakdown">
                             <h3>工作流</h3>
-                            <img src="images/customer_service.jpeg" alt="工作流" style="width: 100%; border-radius: 12px; cursor: pointer;" onclick="event.stopPropagation(); document.getElementById('lightboxImg').src=this.src; document.getElementById('imageLightbox').style.display='flex';">
+                            <img src="images/customer_service.jpeg" alt="工作流" style="width: 100%; border-radius: 12px; cursor: pointer;" onclick="event.stopPropagation(); openLightbox(this.src, true);">
                         </div>
                     </div>
                 </div>
@@ -1556,6 +1556,7 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
+            overflow: hidden;
         }
 
         .image-lightbox img {
@@ -1564,8 +1565,24 @@
             object-fit: contain;
             border-radius: 8px;
             cursor: default;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .image-lightbox img.zoomable {
+            cursor: grab;
+            transition: transform 0.1s ease-out;
+        }
+
+        .image-lightbox img.zoomable.grabbing {
+            cursor: grabbing;
+            transition: none;
         }
     </style>
+
+    <div id="imageLightbox" class="image-lightbox" style="display:none;">
+        <img src="" alt="放大查看" id="lightboxImg">
+    </div>
 
     <script>
         // 个人简介界面相关功能
@@ -1684,34 +1701,96 @@
         const imageLightbox = document.getElementById('imageLightbox');
         const lightboxImg = document.getElementById('lightboxImg');
 
-        function openLightbox(src) {
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let lastTranslateX = 0;
+        let lastTranslateY = 0;
+        let zoomEnabled = false;
+
+        function updateTransform() {
+            lightboxImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        }
+
+        function resetLightbox() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            lastTranslateX = 0;
+            lastTranslateY = 0;
+            isDragging = false;
+            zoomEnabled = false;
+            lightboxImg.style.transform = '';
+            lightboxImg.classList.remove('grabbing', 'zoomable');
+        }
+
+        function openLightbox(src, enableZoom) {
+            resetLightbox();
             lightboxImg.src = src;
+            zoomEnabled = !!enableZoom;
+            if (zoomEnabled) {
+                lightboxImg.classList.add('zoomable');
+            }
             imageLightbox.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
-        // 点击作品一览中的图片放大
-        if (portfolioOverlay) {
-            portfolioOverlay.addEventListener('click', function(e) {
-                if (e.target.tagName === 'IMG') {
-                    e.stopPropagation();
-                    openLightbox(e.target.src);
-                }
-            });
+        function closeLightbox() {
+            imageLightbox.style.display = 'none';
+            lightboxImg.src = '';
+            resetLightbox();
+            document.body.style.overflow = '';
         }
 
-        // 点击个人简介中的图片放大
-        if (profileOverlay) {
-            profileOverlay.addEventListener('click', function(e) {
-                if (e.target.tagName === 'IMG') {
-                    e.stopPropagation();
-                    openLightbox(e.target.src);
-                }
-            });
-        }
+        // 滚轮缩放（仅zoomEnabled时生效）
+        imageLightbox.addEventListener('wheel', function(e) {
+            if (imageLightbox.style.display !== 'flex') return;
+            if (!zoomEnabled) return;
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            const newScale = Math.max(0.5, Math.min(5, scale + delta));
+            scale = newScale;
+            updateTransform();
+        }, { passive: false });
+
+        // 鼠标按下开始拖拽（仅zoomEnabled时生效）
+        lightboxImg.addEventListener('mousedown', function(e) {
+            if (!zoomEnabled || scale <= 1) return;
+            e.preventDefault();
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            lastTranslateX = translateX;
+            lastTranslateY = translateY;
+            lightboxImg.classList.add('grabbing');
+        });
+
+        // 鼠标移动拖拽
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            translateX = lastTranslateX + dx;
+            translateY = lastTranslateY + dy;
+            updateTransform();
+        });
+
+        // 鼠标松开结束拖拽
+        document.addEventListener('mouseup', function() {
+            if (!isDragging) return;
+            isDragging = false;
+            lightboxImg.classList.remove('grabbing');
+        });
+
+        // 点击背景关闭灯箱
+        imageLightbox.addEventListener('click', function(e) {
+            if (e.target === imageLightbox) {
+                closeLightbox();
+            }
+        });
     </script>
-
-    <div id="imageLightbox" class="image-lightbox" style="display:none;" onclick="this.style.display='none'; document.getElementById('lightboxImg').src='';">
-        <img src="" alt="放大查看" id="lightboxImg" onclick="event.stopPropagation();">
-    </div>
 </body>
 </html>
