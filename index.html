@@ -656,10 +656,15 @@
             });
         });
 
-        // 点击卡片切换（排除01和02卡片）
+        // 点击卡片切换（排除01、02、03卡片）
         books.forEach((book, index) => {
             book.addEventListener('click', (e) => {
                 if (index === 0 || index === 1) {
+                    return;
+                }
+                if (index === 2) {
+                    e.stopPropagation();
+                    openContactOverlay();
                     return;
                 }
                 navigateTo(index);
@@ -1047,6 +1052,46 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 联系方式覆盖层 -->
+    <div id="contactOverlay" class="profile-overlay">
+        <nav class="profile-nav">
+            <button class="profile-back-btn" onclick="closeContactOverlay()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 18L9 12L15 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>返回</span>
+            </button>
+            <div class="profile-nav-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="188" height="34" viewBox="0 0 188 34" fill="none">
+                    <path d="M3.54545 34V0H19.8182C21.0682 0 22.1023 0.267045 22.9205 0.801136C23.7386 1.32386 24.3523 2.02841 24.7614 2.91477C25.1818 3.78977 25.392 4.77273 25.392 5.86364C25.392 6.71591 25.2557 7.46023 24.983 8.09659C24.7216 8.73295 24.3466 9.25568 23.858 9.66477C23.3693 10.0625 22.7898 10.3409 22.1193 10.5V10.7045C22.983 10.8068 23.7216 11.1193 24.3352 11.642C24.9489 12.1648 25.4034 12.8295 25.6989 13.6364C25.9943 14.4432 26.142 15.3239 26.142 16.2784C26.142 17.3807 25.9205 18.3977 25.4773 19.3295C25.0341 20.2614 24.358 21.0057 23.4489 21.5625C22.5511 22.108 21.4091 22.3807 20.0227 22.3807H9.10227V16.7045H18.0227C18.4886 16.7045 18.9034 16.6136 19.267 16.4318C19.642 16.25 19.9432 15.9886 20.1705 15.6477C20.3977 15.3068 20.5114 14.9091 20.5114 14.4545C20.5114 13.9886 20.3977 13.5852 20.1705 13.2443C19.9432 12.9034 19.642 12.642 19.267 12.4602C18.9034 12.2784 18.4886 12.1875 18.0227 12.1875H9.10227V5.72727H16.7727C17.2955 5.72727 17.733 5.61932 18.0852 5.40341C18.4489 5.1875 18.7273 4.89205 18.9205 4.51705C19.1136 4.13068 19.2102 3.69318 19.2102 3.20455C19.2102 2.73864 19.1136 2.33523 18.9205 1.99432C18.7273 1.64205 18.4489 1.36932 18.0852 1.17614C17.733 0.982955 17.2955 0.886364 16.7727 0.886364H3.54545V34Z" fill="white"/>
+                </svg>
+            </div>
+            <div class="profile-nav-links">
+                <a href="#" data-book="0">个人简介</a>
+                <a href="#" data-book="1">作品一览</a>
+                <a href="#" data-book="2" class="active">联系方式</a>
+                <a href="#" data-book="3">技能特长</a>
+                <a href="#" data-book="4">其他</a>
+            </div>
+        </nav>
+        <div class="profile-container" style="flex-direction: column; gap: 30px; justify-content: center; align-items: center;">
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.58.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.58 1 1 0 01-.25 1.01l-2.2 2.2z" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                </div>
+                <span class="contact-text">18753712779</span>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon" style="background: none; width: auto; height: auto;">
+                    <img src="images/微信二维码.png" alt="微信二维码" style="width: 200px; border-radius: 12px;">
+                </div>
+                <span class="contact-text">微信扫码添加</span>
             </div>
         </div>
     </div>
@@ -1608,6 +1653,31 @@
             cursor: grabbing;
             transition: none;
         }
+
+        /* 联系方式覆盖层 */
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .contact-icon {
+            width: 80px;
+            height: 80px;
+            background-color: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #000000;
+            letter-spacing: 1px;
+        }
     </style>
 
     <div id="imageLightbox" class="image-lightbox" style="display:none;">
@@ -1721,6 +1791,32 @@
                 e.preventDefault();
                 const bookId = parseInt(link.getAttribute('data-book'));
                 closePortfolioOverlay();
+                setTimeout(() => {
+                    navigateTo(bookId);
+                }, 400);
+            });
+        });
+
+        // ======== 联系方式界面 ========
+        const contactOverlay = document.getElementById('contactOverlay');
+
+        function openContactOverlay() {
+            contactOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeContactOverlay() {
+            contactOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // 导航链接点击事件
+        const contactNavLinks = document.querySelectorAll('#contactOverlay .profile-nav-links a');
+        contactNavLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const bookId = parseInt(link.getAttribute('data-book'));
+                closeContactOverlay();
                 setTimeout(() => {
                     navigateTo(bookId);
                 }, 400);
