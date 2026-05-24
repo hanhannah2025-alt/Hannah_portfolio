@@ -725,6 +725,9 @@
                     <path d="M24.1023 34.9091H0.264795L6.60229 15.4091L12.6023 12.9091L20.1023 14.4091L24.1023 34.9091Z" fill="#E06336"/>
                     <path d="M116.102 34.9091H92.2648L98.6023 15.4091L104.602 12.9091L112.102 14.4091L116.102 34.9091Z" fill="#E06336"/>
                     </svg>
+                    <svg class="nav-back-arrow" width="14" height="24" viewBox="0 0 14 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.1224 2.5L2.77937 11.1711C2.41097 11.554 2.40633 12.1581 2.76881 12.5466L11.1224 21.5" stroke="#E06336" stroke-width="5" stroke-linecap="round"/>
+                    </svg>
             </div>
             <div class="profile-nav-links">
                 <a href="#" data-book="0" class="active">About Me</a>
@@ -891,6 +894,9 @@
                     <path d="M7.26136 19.7727V34.9091H0V0H7.05682V13.3466H7.36364C7.95455 11.8011 8.90909 10.5909 10.2273 9.71591C11.5455 8.82955 13.1989 8.38636 15.1875 8.38636C17.0057 8.38636 18.5909 8.78409 19.9432 9.57955C21.3068 10.3636 22.3636 11.4943 23.1136 12.9716C23.875 14.4375 24.25 16.1932 24.2386 18.2386V34.9091H16.9773V19.5341C16.9886 17.9205 16.5795 16.6648 15.75 15.767C14.9318 14.8693 13.7841 14.4205 12.3068 14.4205C11.3182 14.4205 10.4432 14.6307 9.68182 15.0511C8.93182 15.4716 8.34091 16.0852 7.90909 16.892C7.48864 17.6875 7.27273 18.6477 7.26136 19.7727Z" fill="#E06336"/>
                     <path d="M24.1023 34.9091H0.264795L6.60229 15.4091L12.6023 12.9091L20.1023 14.4091L24.1023 34.9091Z" fill="#E06336"/>
                     <path d="M116.102 34.9091H92.2648L98.6023 15.4091L104.602 12.9091L112.102 14.4091L116.102 34.9091Z" fill="#E06336"/>
+                    </svg>
+                    <svg class="nav-back-arrow" width="14" height="24" viewBox="0 0 14 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.1224 2.5L2.77937 11.1711C2.41097 11.554 2.40633 12.1581 2.76881 12.5466L11.1224 21.5" stroke="#E06336" stroke-width="5" stroke-linecap="round"/>
                     </svg>
             </div>
             <div class="profile-nav-links">
@@ -1084,6 +1090,9 @@
                     <path d="M24.1023 34.9091H0.264795L6.60229 15.4091L12.6023 12.9091L20.1023 14.4091L24.1023 34.9091Z" fill="#E06336"/>
                     <path d="M116.102 34.9091H92.2648L98.6023 15.4091L104.602 12.9091L112.102 14.4091L116.102 34.9091Z" fill="#E06336"/>
                     </svg>
+                    <svg class="nav-back-arrow" width="14" height="24" viewBox="0 0 14 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.1224 2.5L2.77937 11.1711C2.41097 11.554 2.40633 12.1581 2.76881 12.5466L11.1224 21.5" stroke="#E06336" stroke-width="5" stroke-linecap="round"/>
+                    </svg>
             </div>
             <div class="profile-nav-links">
                 <a href="#" data-book="0">About Me</a>
@@ -1132,6 +1141,9 @@
                     <path d="M24.1023 34.9091H0.264795L6.60229 15.4091L12.6023 12.9091L20.1023 14.4091L24.1023 34.9091Z" fill="#E06336"/>
                     <path d="M116.102 34.9091H92.2648L98.6023 15.4091L104.602 12.9091L112.102 14.4091L116.102 34.9091Z" fill="#E06336"/>
                 </svg>
+                    <svg class="nav-back-arrow" width="14" height="24" viewBox="0 0 14 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.1224 2.5L2.77937 11.1711C2.41097 11.554 2.40633 12.1581 2.76881 12.5466L11.1224 21.5" stroke="#E06336" stroke-width="5" stroke-linecap="round"/>
+                    </svg>
             </div>
             <div class="profile-nav-links">
                 <a href="#" data-book="0">About Me</a>
@@ -1179,11 +1191,25 @@
             position: absolute;
             top: 40px;
             left: 60px;
+            display: flex;
+            align-items: center;
         }
 
         .profile-nav-logo svg {
             height: 36px;
             width: auto;
+        }
+
+        .nav-back-arrow {
+            cursor: pointer;
+            margin-left: 16px;
+            transition: opacity 0.3s;
+            height: 24px;
+            width: auto;
+        }
+
+        .nav-back-arrow:hover {
+            opacity: 0.7;
         }
 
         /* 个人简介界面导航栏 */
@@ -1816,17 +1842,26 @@
             });
         });
 
-        // 导航链接点击事件 - 关闭界面并跳转到对应卡片
+        // 导航链接点击事件 - 切换至对应界面
+        function navigateOverlay(bookId) {
+            // 先关闭所有界面
+            closeProfileOverlay();
+            closePortfolioOverlay();
+            closeContactOverlay();
+            closeProductSenseOverlay();
+            // 打开目标界面
+            if (bookId === 0) openProfileOverlay();
+            else if (bookId === 1) openPortfolioOverlay();
+            else if (bookId === 2) openContactOverlay();
+            else if (bookId === 3) openProductSenseOverlay();
+        }
+
         const profileNavLinks = document.querySelectorAll('#profileOverlay .profile-nav-links a');
         profileNavLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const bookId = parseInt(link.getAttribute('data-book'));
-                closeProfileOverlay();
-                // 使用 setTimeout 确保 overlay 关闭动画完成后再导航
-                setTimeout(() => {
-                    navigateTo(bookId);
-                }, 400);
+                navigateOverlay(bookId);
             });
         });
 
@@ -1852,6 +1887,9 @@
             portfolioContentsDesk.forEach(content => {
                 content.classList.toggle('active', content.id === tabId);
             });
+            // 切换标签时将内容滚动到顶部
+            const wrapper = document.querySelector('#portfolioOverlay .profile-content-wrapper');
+            if (wrapper) wrapper.scrollTop = 0;
         }
 
         // 点击 02 卡片打开作品一览
@@ -1876,10 +1914,7 @@
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const bookId = parseInt(link.getAttribute('data-book'));
-                closePortfolioOverlay();
-                setTimeout(() => {
-                    navigateTo(bookId);
-                }, 400);
+                navigateOverlay(bookId);
             });
         });
 
@@ -1902,10 +1937,7 @@
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const bookId = parseInt(link.getAttribute('data-book'));
-                closeContactOverlay();
-                setTimeout(() => {
-                    navigateTo(bookId);
-                }, 400);
+                navigateOverlay(bookId);
             });
         });
 
@@ -1928,10 +1960,17 @@
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const bookId = parseInt(link.getAttribute('data-book'));
+                navigateOverlay(bookId);
+            });
+        });
+
+        // ======== 返回箭头 ========
+        document.querySelectorAll('.nav-back-arrow').forEach(arrow => {
+            arrow.addEventListener('click', () => {
+                closeProfileOverlay();
+                closePortfolioOverlay();
+                closeContactOverlay();
                 closeProductSenseOverlay();
-                setTimeout(() => {
-                    navigateTo(bookId);
-                }, 400);
             });
         });
 
