@@ -64,15 +64,20 @@
         main {
             flex: 1;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            padding: 40px;
+            overflow: visible;
         }
+
+        .particle-spacer-top { flex: 1; }
+        .particle-spacer-mid { flex: 1; }
+        .particle-spacer-bottom { flex: 1.5; }
 
         /* 书架容器 */
         .bookshelf-container {
             width: 100%;
-            height: 100vh;
+            height: 620px;
+            flex-shrink: 0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -353,7 +358,7 @@
             }
 
             .bookshelf-container {
-                height: 90vh;
+                height: 450px;
             }
 
             .books-container {
@@ -408,7 +413,7 @@
         /* 响应式布局 - 平板端 */
         @media (min-width: 769px) and (max-width: 1024px) {
             .bookshelf-container {
-                height: 95vh;
+                height: 520px;
             }
 
             .books-container {
@@ -434,7 +439,7 @@
         /* 响应式布局 - 桌面端 */
         @media (min-width: 1025px) {
             .bookshelf-container {
-                height: 100vh;
+                height: 620px;
             }
 
             .books-container {
@@ -481,6 +486,16 @@
     </nav>
 
     <main>
+        <div class="particle-spacer-top"></div>
+
+        <!-- 粒子特效占位 -->
+        <div class="particle-hero" id="particleHero">
+            <div class="particle-click-zone" id="particleClickZone"></div>
+            <span class="particle-hint">click me</span>
+        </div>
+
+        <div class="particle-spacer-mid"></div>
+
         <div class="bookshelf-container">
             <!-- 左箭头按钮 -->
             <button class="arrow-btn left" id="prevBtn">
@@ -531,6 +546,8 @@
                 <div class="indicator" data-index="4"></div>
             </div>
         </div>
+
+        <div class="particle-spacer-bottom"></div>
     </main>
 
 
@@ -1782,7 +1799,59 @@
             border-radius: 50px;
             letter-spacing: 1px;
         }
+
+        /* ======== 粒子特效 ======== */
+        .particle-hero {
+            width: 100%;
+            height: 136px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 101;
+            cursor: default;
+        }
+
+        .particle-click-zone {
+            position: absolute;
+            inset: 0;
+            cursor: pointer;
+            z-index: 102;
+        }
+
+        .particle-hint {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(250, 248, 245, 0.35);
+            font-size: 12px;
+            letter-spacing: 2px;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+            z-index: 103;
+        }
+
+        @media (max-width: 768px) {
+            .particle-hero {
+                height: 88px;
+            }
+            .particle-hint {
+                font-size: 10px;
+                bottom: 3px;
+            }
+        }
     </style>
+
+    <canvas id="particleCanvas"></canvas>
 
     <div id="imageLightbox" class="image-lightbox" style="display:none;">
         <img src="" alt="放大查看" id="lightboxImg">
@@ -2068,6 +2137,458 @@
                 e.stopPropagation();
             }
         });
+    </script>
+
+    <script>
+    // ======== 粒子特效系统 ========
+    (function() {
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        const hero = document.getElementById('particleHero');
+        const clickZone = document.getElementById('particleClickZone');
+        const hint = document.querySelector('.particle-hint');
+
+        const WORDS = ['Hi', "I'm Hannah", 'SMILEY', 'Have a nice day'];
+        let currentWordIndex = 0;
+        let particles = [];
+        let animationId;
+        let mouseX = -1000;
+        let mouseY = -1000;
+        const MOUSE_RADIUS = 70;
+        let isTransitioning = false;
+        let textCenterX = 0;
+        let textCenterY = 0;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function getHeroRect() {
+            const rect = hero.getBoundingClientRect();
+            return {
+                x: rect.left,
+                y: rect.top,
+                w: rect.width,
+                h: rect.height
+            };
+        }
+
+        function getTextPositions(text) {
+            const area = getHeroRect();
+            const offW = Math.max(area.w, 400);
+            const offH = Math.max(area.h, 80);
+
+            // Use main canvas directly for reliable font rendering
+            const prevData = ctx.getImageData(area.x, area.y, offW, offH);
+            ctx.clearRect(area.x, area.y, offW, offH);
+
+            const cx = area.x + offW / 2;
+            const cy = area.y + offH / 2;
+
+            if (text === 'SMILEY') {
+                // Draw a simple smiley face
+                const size = Math.min(offW * 0.2, offH * 0.45);
+                ctx.strokeStyle = 'white';
+                ctx.fillStyle = 'white';
+                const lw = Math.max(3, size * 0.08);
+                ctx.lineWidth = lw;
+
+                // Face circle
+                ctx.beginPath();
+                ctx.arc(cx, cy, size, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Left eye
+                const eyeY = cy - size * 0.25;
+                const eyeX = size * 0.3;
+                ctx.beginPath();
+                ctx.arc(cx - eyeX, eyeY, lw * 1.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Right eye
+                ctx.beginPath();
+                ctx.arc(cx + eyeX, eyeY, lw * 1.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Smile arc
+                ctx.beginPath();
+                ctx.arc(cx, cy, size * 0.55, Math.PI * 0.15, Math.PI * 0.85);
+                ctx.stroke();
+            } else {
+                const fontSize = Math.min(offW / 7, offH * 0.75, 104);
+                ctx.fillStyle = 'white';
+                ctx.font = `bold ${fontSize}px "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, cx, cy);
+            }
+
+            const imageData = ctx.getImageData(area.x, area.y, offW, offH);
+            // Restore canvas
+            ctx.putImageData(prevData, area.x, area.y);
+
+            const pixels = imageData.data;
+            const gap = 4;
+            const MAX_PARTICLES = 6000;
+            const positions = [];
+
+            for (let y = 0; y < offH; y += gap) {
+                for (let x = 0; x < offW; x += gap) {
+                    const index = (y * offW + x) * 4;
+                    if (pixels[index + 3] > 150) {
+                        positions.push({
+                            x: area.x + x,
+                            y: area.y + y
+                        });
+                    }
+                }
+            }
+
+            if (positions.length > MAX_PARTICLES) {
+                const step = positions.length / MAX_PARTICLES;
+                const sampled = [];
+                for (let i = 0; i < MAX_PARTICLES; i++) {
+                    sampled.push(positions[Math.floor(i * step)]);
+                }
+                return sampled;
+            }
+
+            if (positions.length < 20) {
+                const cols = Math.floor(offW / gap);
+                const rows = Math.floor(offH / gap);
+                const letterW = offW * 0.55;
+                const letterH = offH * 0.55;
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const px = area.x + col * gap;
+                        const py = area.y + row * gap;
+                        const dx = px - cx;
+                        const dy = py - cy;
+                        if (Math.abs(dx) < letterW / 2 && Math.abs(dy) < letterH / 2) {
+                            positions.push({ x: px, y: py });
+                        }
+                    }
+                }
+            }
+
+            return positions;
+        }
+
+        class Particle {
+            constructor(x, y, targetX, targetY) {
+                this.x = x;
+                this.y = y;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.size = Math.random() * 2.5 + 1.5;
+                this.baseSize = this.size;
+                const lightness = 25 + Math.random() * 65;
+                this.color = `hsl(0, 0%, ${lightness}%)`;
+                this.vx = 0;
+                this.vy = 0;
+                this.dying = false;
+                this.wanderAngle = Math.random() * Math.PI * 2;
+                this.wanderSpeed = Math.random() * 0.02 + 0.005;
+                this.wanderRadius = Math.random() * 2 + 0.5;
+            }
+
+            update() {
+                if (this.dying) {
+                    this.size *= 0.9;
+                    if (this.size < 0.3) {
+                        this.size = 0;
+                        return;
+                    }
+                }
+
+                this.wanderAngle += this.wanderSpeed;
+                const wanderX = Math.cos(this.wanderAngle) * this.wanderRadius;
+                const wanderY = Math.sin(this.wanderAngle) * this.wanderRadius;
+
+                const dx = (this.targetX + wanderX) - this.x;
+                const dy = (this.targetY + wanderY) - this.y;
+
+                const ease = isTransitioning ? 0.12 : 0.03;
+                this.vx += dx * ease;
+                this.vy += dy * ease;
+
+                const mdx = this.x - mouseX;
+                const mdy = this.y - mouseY;
+                const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+
+                if (mdist < MOUSE_RADIUS && mdist > 0 && !this.dying) {
+                    const force = (1 - mdist / MOUSE_RADIUS) * 3;
+                    this.vx += (mdx / mdist) * force;
+                    this.vy += (mdy / mdist) * force;
+                    this.size += (this.baseSize * 2 - this.size) * 0.15;
+                } else {
+                    this.size += (this.baseSize - this.size) * 0.1;
+                }
+
+                this.vx *= 0.88;
+                this.vy *= 0.88;
+
+                const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                if (speed > 10) {
+                    this.vx = (this.vx / speed) * 10;
+                    this.vy = (this.vy / speed) * 10;
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        function updateTextCenter() {
+            if (particles.length === 0) return;
+            let sumX = 0, sumY = 0;
+            particles.forEach(p => { sumX += p.targetX; sumY += p.targetY; });
+            textCenterX = sumX / particles.length;
+            textCenterY = sumY / particles.length;
+        }
+
+        function createParticles(targetPositions) {
+            if (particles.length > 0) {
+                const area = getHeroRect();
+                const heroCx = area.x + area.w / 2;
+                const heroCy = area.y + area.h / 2;
+                particles.forEach((p, i) => {
+                    if (i < targetPositions.length) {
+                        p.targetX = targetPositions[i].x;
+                        p.targetY = targetPositions[i].y;
+                        p.dying = false;
+                    } else {
+                        p.targetX = heroCx;
+                        p.targetY = heroCy;
+                        p.dying = true;
+                    }
+                });
+
+                if (particles.length < targetPositions.length) {
+                    for (let i = particles.length; i < targetPositions.length; i++) {
+                        particles.push(new Particle(
+                            textCenterX + (Math.random() - 0.5) * 200,
+                            textCenterY + (Math.random() - 0.5) * 200,
+                            targetPositions[i].x,
+                            targetPositions[i].y
+                        ));
+                    }
+                }
+            } else {
+                const area = getHeroRect();
+                const cx = area.x + area.w / 2;
+                const cy = area.y + area.h / 2;
+                const maxRadius = Math.max(area.w * 0.5, area.h * 1.5);
+                particles = targetPositions.map(pos => {
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = maxRadius * (0.3 + Math.random() * 0.7);
+                    return new Particle(
+                        cx + Math.cos(angle) * radius,
+                        cy + Math.sin(angle) * radius,
+                        pos.x,
+                        pos.y
+                    );
+                });
+            }
+            updateTextCenter();
+        }
+
+        function switchWord() {
+            currentWordIndex = (currentWordIndex + 1) % WORDS.length;
+            const newWord = WORDS[currentWordIndex];
+            const area = getHeroRect();
+            const cx = area.x + area.w / 2;
+            const cy = area.y + area.h / 2;
+
+            isTransitioning = true;
+
+            // Get new targets first to know how many particles we need
+            const targets = getTextPositions(newWord);
+
+            // Mark extra particles as dying, scatter the rest
+            const scatterRadius = Math.max(area.w * 0.45, area.h * 2.5);
+
+            particles.forEach((p, i) => {
+                if (i < targets.length) {
+                    // This particle will be reused — scatter it
+                    const dx = p.x - cx;
+                    const dy = p.y - cy;
+                    const angle = Math.atan2(dy, dx);
+                    const scatterAngle = angle + (Math.random() - 0.5) * 1.0;
+                    const scatterDist = scatterRadius * (0.4 + Math.random() * 0.6);
+                    p.targetX = cx + Math.cos(scatterAngle) * scatterDist;
+                    p.targetY = cy + Math.sin(scatterAngle) * scatterDist;
+                    p.dying = false;
+                } else {
+                    // Extra particle — fade into center
+                    p.targetX = cx;
+                    p.targetY = cy;
+                    p.dying = true;
+                }
+            });
+
+            // Spawn new particles if needed, starting from center
+            if (particles.length < targets.length) {
+                for (let i = particles.length; i < targets.length; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const r = scatterRadius * (0.3 + Math.random() * 0.4);
+                    particles.push(new Particle(
+                        cx + Math.cos(angle) * r,
+                        cy + Math.sin(angle) * r,
+                        targets[i].x,
+                        targets[i].y
+                    ));
+                }
+            }
+
+            if (hint) {
+                hint.style.opacity = '0';
+            }
+
+            // After scatter delay, reassign targets for kept particles
+            setTimeout(() => {
+                for (let i = 0; i < Math.min(particles.length, targets.length); i++) {
+                    if (!particles[i].dying) {
+                        particles[i].targetX = targets[i].x;
+                        particles[i].targetY = targets[i].y;
+                    }
+                }
+                setTimeout(() => {
+                    isTransitioning = false;
+                }, 500);
+            }, 280);
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                if (p.size <= 0) {
+                    particles.splice(i, 1);
+                } else {
+                    p.draw(ctx);
+                }
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function init() {
+            resize();
+            const targets = getTextPositions(WORDS[0]);
+            createParticles(targets);
+            if (particles.length === 0) {
+                const fallback = getTextPositions('Hi!');
+                createParticles(fallback);
+            }
+            animate();
+        }
+
+        let resizeTimeout;
+        function recalculatePositions() {
+            resize();
+            if (isTransitioning) return;
+            const targets = getTextPositions(WORDS[currentWordIndex]);
+            createParticles(targets);
+        }
+
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(recalculatePositions, 250);
+        });
+
+        window.addEventListener('scroll', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(recalculatePositions, 150);
+        }, { passive: true });
+
+        // Mouse tracking on canvas
+        canvas.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            mouseX = -1000;
+            mouseY = -1000;
+        });
+
+        // Click through canvas: only handle clicks in hero area
+        canvas.addEventListener('click', (e) => {
+            if (isTransitioning) return;
+            const area = getHeroRect();
+            if (e.clientX >= area.x && e.clientX <= area.x + area.w &&
+                e.clientY >= area.y && e.clientY <= area.y + area.h) {
+                switchWord();
+            } else {
+                // Pass click through to element below
+                canvas.style.pointerEvents = 'none';
+                const el = document.elementFromPoint(e.clientX, e.clientY);
+                canvas.style.pointerEvents = 'auto';
+                if (el) {
+                    el.focus();
+                    el.dispatchEvent(new MouseEvent('click', {
+                        clientX: e.clientX, clientY: e.clientY, bubbles: true
+                    }));
+                }
+            }
+        });
+
+        // Click zone on hero for reliable click detection + mouse tracking
+        clickZone.addEventListener('click', (e) => {
+            if (isTransitioning) return;
+            e.stopPropagation();
+            switchWord();
+        });
+
+        clickZone.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        clickZone.addEventListener('mouseleave', () => {
+            mouseX = -1000;
+            mouseY = -1000;
+        });
+
+        clickZone.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
+        }, { passive: false });
+
+        clickZone.addEventListener('touchend', () => {
+            mouseX = -1000;
+            mouseY = -1000;
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', () => {
+            mouseX = -1000;
+            mouseY = -1000;
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
     </script>
 </body>
 </html>
