@@ -1908,11 +1908,18 @@
             closePortfolioOverlay();
             closeContactOverlay();
             closeProductSenseOverlay();
-            // 打开目标界面
-            if (bookId === 0) openProfileOverlay();
-            else if (bookId === 1) openPortfolioOverlay();
-            else if (bookId === 2) openContactOverlay();
-            else if (bookId === 3) openProductSenseOverlay();
+            // 打开目标界面，并重置左侧标签到第一个
+            if (bookId === 0) {
+                openProfileOverlay();
+                switchProfileTab('about');
+            } else if (bookId === 1) {
+                openPortfolioOverlay();
+                switchPortfolioTab('agent-kaoyan');
+            } else if (bookId === 2) {
+                openContactOverlay();
+            } else if (bookId === 3) {
+                openProductSenseOverlay();
+            }
         }
 
         const profileNavLinks = document.querySelectorAll('#profileOverlay .profile-nav-links a');
