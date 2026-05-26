@@ -50,6 +50,7 @@
             position: relative;
             font-weight: bold;
             letter-spacing: 1px;
+            outline: none;
         }
 
         nav a:hover,
@@ -195,20 +196,17 @@
 
         /* 轮播指示器 */
         .carousel-indicators {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
             display: flex;
+            justify-content: center;
             gap: 12px;
-            z-index: 60;
+            margin-top: 32px;
         }
 
         .indicator {
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.3);
+            background: #BABABA;
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -219,7 +217,8 @@
         }
 
         .indicator:hover {
-            background: rgba(0, 0, 0, 0.6);
+            background: #E06336;
+            opacity: 0.7;
         }
 
         /* 卡片内容 - 竖向分布 */
@@ -406,7 +405,7 @@
             }
 
             .carousel-indicators {
-                bottom: 40px;
+                margin-top: 12px;
             }
         }
 
@@ -536,15 +535,14 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- 轮播指示器 -->
-            <div class="carousel-indicators">
-                <div class="indicator active" data-index="0"></div>
-                <div class="indicator" data-index="1"></div>
-                <div class="indicator" data-index="2"></div>
-                <div class="indicator" data-index="3"></div>
-                <div class="indicator" data-index="4"></div>
-            </div>
+        <!-- 轮播指示器 -->
+        <div class="carousel-indicators">
+            <div class="indicator active" data-index="0"></div>
+            <div class="indicator" data-index="1"></div>
+            <div class="indicator" data-index="2"></div>
+            <div class="indicator" data-index="3"></div>
         </div>
 
         <div class="particle-spacer-bottom"></div>
@@ -2158,6 +2156,11 @@
         let isTransitioning = false;
         let textCenterX = 0;
         let textCenterY = 0;
+        let positionCache = {}; // word → { offW, offH, relPositions: [{rx, ry}, ...] }
+
+        function clearPositionCache() {
+            positionCache = {};
+        }
 
         function resize() {
             canvas.width = window.innerWidth;
@@ -2179,7 +2182,18 @@
             const offW = Math.max(area.w, 400);
             const offH = Math.max(area.h, 80);
 
-            // Use main canvas directly for reliable font rendering
+            // Return cached positions if area dimensions approximately match
+            // (tolerates scrollbar-induced width changes of up to 30px)
+            const cached = positionCache[text];
+            if (cached && Math.abs(cached.offW - offW) < 30 && Math.abs(cached.offH - offH) < 5) {
+                return cached.relPositions.map(p => ({
+                    x: area.x + p.rx,
+                    y: area.y + p.ry
+                }));
+            }
+
+            // Render text on main canvas to sample pixels
+            ctx.save();
             const prevData = ctx.getImageData(area.x, area.y, offW, offH);
             ctx.clearRect(area.x, area.y, offW, offH);
 
@@ -2187,31 +2201,26 @@
             const cy = area.y + offH / 2;
 
             if (text === 'SMILEY') {
-                // Draw a simple smiley face
                 const size = Math.min(offW * 0.2, offH * 0.45);
                 ctx.strokeStyle = 'white';
                 ctx.fillStyle = 'white';
                 const lw = Math.max(3, size * 0.08);
                 ctx.lineWidth = lw;
 
-                // Face circle
                 ctx.beginPath();
                 ctx.arc(cx, cy, size, 0, Math.PI * 2);
                 ctx.stroke();
 
-                // Left eye
                 const eyeY = cy - size * 0.25;
                 const eyeX = size * 0.3;
                 ctx.beginPath();
                 ctx.arc(cx - eyeX, eyeY, lw * 1.2, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Right eye
                 ctx.beginPath();
                 ctx.arc(cx + eyeX, eyeY, lw * 1.2, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Smile arc
                 ctx.beginPath();
                 ctx.arc(cx, cy, size * 0.55, Math.PI * 0.15, Math.PI * 0.85);
                 ctx.stroke();
@@ -2225,22 +2234,21 @@
             }
 
             const imageData = ctx.getImageData(area.x, area.y, offW, offH);
-            // Restore canvas
             ctx.putImageData(prevData, area.x, area.y);
+            ctx.restore();
 
             const pixels = imageData.data;
             const gap = 4;
             const MAX_PARTICLES = 6000;
             const positions = [];
+            const relPositions = [];
 
             for (let y = 0; y < offH; y += gap) {
                 for (let x = 0; x < offW; x += gap) {
                     const index = (y * offW + x) * 4;
                     if (pixels[index + 3] > 150) {
-                        positions.push({
-                            x: area.x + x,
-                            y: area.y + y
-                        });
+                        positions.push({ x: area.x + x, y: area.y + y });
+                        relPositions.push({ rx: x, ry: y });
                     }
                 }
             }
@@ -2248,28 +2256,18 @@
             if (positions.length > MAX_PARTICLES) {
                 const step = positions.length / MAX_PARTICLES;
                 const sampled = [];
+                const sampledRel = [];
                 for (let i = 0; i < MAX_PARTICLES; i++) {
-                    sampled.push(positions[Math.floor(i * step)]);
+                    const idx = Math.floor(i * step);
+                    sampled.push(positions[idx]);
+                    sampledRel.push(relPositions[idx]);
                 }
+                positionCache[text] = { offW, offH, relPositions: sampledRel };
                 return sampled;
             }
 
-            if (positions.length < 20) {
-                const cols = Math.floor(offW / gap);
-                const rows = Math.floor(offH / gap);
-                const letterW = offW * 0.55;
-                const letterH = offH * 0.55;
-                for (let row = 0; row < rows; row++) {
-                    for (let col = 0; col < cols; col++) {
-                        const px = area.x + col * gap;
-                        const py = area.y + row * gap;
-                        const dx = px - cx;
-                        const dy = py - cy;
-                        if (Math.abs(dx) < letterW / 2 && Math.abs(dy) < letterH / 2) {
-                            positions.push({ x: px, y: py });
-                        }
-                    }
-                }
+            if (positions.length > 0) {
+                positionCache[text] = { offW, offH, relPositions };
             }
 
             return positions;
@@ -2402,6 +2400,7 @@
         }
 
         function switchWord() {
+            if (isTransitioning) return;
             currentWordIndex = (currentWordIndex + 1) % WORDS.length;
             const newWord = WORDS[currentWordIndex];
             const area = getHeroRect();
@@ -2412,6 +2411,13 @@
 
             // Get new targets first to know how many particles we need
             const targets = getTextPositions(newWord);
+
+            // If text rendering failed (no pixels found), abort
+            if (targets.length === 0) {
+                isTransitioning = false;
+                currentWordIndex = (currentWordIndex - 1 + WORDS.length) % WORDS.length;
+                return;
+            }
 
             // Mark extra particles as dying, scatter the rest
             const scatterRadius = Math.max(area.w * 0.45, area.h * 2.5);
@@ -2485,31 +2491,44 @@
 
         function init() {
             resize();
-            const targets = getTextPositions(WORDS[0]);
-            createParticles(targets);
-            if (particles.length === 0) {
-                const fallback = getTextPositions('Hi!');
-                createParticles(fallback);
+            const area = getHeroRect();
+            if (area.w < 100 || area.h < 20) {
+                requestAnimationFrame(init);
+                return;
             }
+            // Pre-render all words into cache
+            WORDS.forEach(w => getTextPositions(w));
+            const targets = getTextPositions(WORDS[0]);
+            if (targets.length === 0) {
+                requestAnimationFrame(init);
+                return;
+            }
+            createParticles(targets);
             animate();
         }
 
         let resizeTimeout;
-        function recalculatePositions() {
+        function recalculatePositions(clearCache) {
             resize();
+            if (clearCache) clearPositionCache();
             if (isTransitioning) return;
+            const area = getHeroRect();
+            if (area.w < 100 || area.h < 20) return;
+            // If cache was cleared, pre-render all words
+            if (clearCache) WORDS.forEach(w => getTextPositions(w));
             const targets = getTextPositions(WORDS[currentWordIndex]);
+            if (targets.length === 0) return;
             createParticles(targets);
         }
 
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(recalculatePositions, 250);
+            resizeTimeout = setTimeout(() => recalculatePositions(true), 250);
         });
 
         window.addEventListener('scroll', () => {
             clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(recalculatePositions, 150);
+            resizeTimeout = setTimeout(() => recalculatePositions(false), 150);
         }, { passive: true });
 
         // Mouse tracking on canvas
@@ -2583,11 +2602,9 @@
             mouseY = -1000;
         });
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
+        document.fonts.ready.then(() => {
+            requestAnimationFrame(() => init());
+        });
     })();
     </script>
 </body>
