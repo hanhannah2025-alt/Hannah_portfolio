@@ -265,6 +265,19 @@
             background: rgba(11, 87, 208, 0.08);
         }
 
+        .upload-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #E5E0DA;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         .upload-text {
             font-size: 16px;
             color: var(--text-secondary);
@@ -477,6 +490,53 @@
             transition: stroke-dashoffset 0.8s ease;
         }
 
+        .match-score-ring .fg-circle.loading-ring {
+            animation: ring-pulse 1.4s ease-in-out infinite;
+        }
+
+        @keyframes ring-pulse {
+            0%, 100% { stroke-dashoffset: 339; }
+            50% { stroke-dashoffset: 283; }
+        }
+
+        .score-loading-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: dot-blink 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes dot-blink {
+            from { opacity: 0.2; }
+            to { opacity: 1; }
+        }
+
+        .loading-placeholder {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .loading-shimmer {
+            display: block;
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #F0EDE8 25%, #E5E0DA 50%, #F0EDE8 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            margin-bottom: 8px;
+        }
+
+        .loading-shimmer:last-child {
+            width: 60%;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
         /* ======== 要素对比列表 ======== */
         .compare-list {
             display: flex;
@@ -486,9 +546,8 @@
 
         .compare-item {
             display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
+            flex-direction: column;
+            gap: 6px;
             padding: 12px 0;
             border-bottom: 1px solid #F0EDE8;
         }
@@ -497,12 +556,46 @@
             border-bottom: none;
         }
 
+        .compare-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
         .compare-label {
             font-size: 15px;
             font-weight: 600;
             color: var(--text);
             flex-shrink: 0;
             white-space: nowrap;
+        }
+
+        .compare-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .compare-tag {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        .compare-tag.jd {
+            background: #E8F0FE;
+            color: #0B57D0;
+        }
+
+        .compare-tag.you {
+            background: #F0EDE8;
+            color: var(--text);
         }
 
         .compare-detail {
@@ -546,6 +639,111 @@
         .match-status.missing {
             background: rgba(198, 40, 40, 0.08);
             color: var(--danger);
+        }
+
+        /* ======== 一键优化按钮 ======== */
+        /* ======== 圆形优化按钮 ======== */
+        .optimize-circle-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .optimize-ripple {
+            position: absolute;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 2px solid rgba(11, 87, 208, 0.25);
+            animation: ripple-pulse 2s ease-in-out infinite;
+        }
+
+        .optimize-ripple.done {
+            animation: none;
+            opacity: 0;
+        }
+
+        @keyframes ripple-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.35); opacity: 0; }
+        }
+
+        .optimize-circle {
+            position: relative;
+            z-index: 1;
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 16px rgba(11, 87, 208, 0.3);
+        }
+
+        .optimize-circle:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 24px rgba(11, 87, 208, 0.4);
+        }
+
+        .optimize-circle:active {
+            transform: scale(0.95);
+        }
+
+        .optimize-circle.is-loading {
+            pointer-events: none;
+            animation: circle-breathe 1.2s ease-in-out infinite;
+        }
+
+        @keyframes circle-breathe {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 16px rgba(11, 87, 208, 0.3); }
+            50% { transform: scale(1.06); box-shadow: 0 8px 28px rgba(11, 87, 208, 0.5); }
+        }
+
+        /* ======== 波形线条动画 ======== */
+        .wave-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 28px;
+        }
+
+        .wave-bar {
+            display: block;
+            width: 4px;
+            border-radius: 2px;
+            background: #fff;
+            animation: wave-bounce 0.9s ease-in-out infinite;
+        }
+
+        .wave-bar:nth-child(1) { height: 14px; }
+        .wave-bar:nth-child(2) { height: 22px; animation-delay: 0.15s; }
+        .wave-bar:nth-child(3) { height: 10px; animation-delay: 0.3s; }
+
+        .is-loading .wave-bar {
+            animation-duration: 0.6s;
+        }
+
+        .is-loading .wave-bar:nth-child(1) { height: 24px; }
+        .is-loading .wave-bar:nth-child(2) { height: 6px; }
+        .is-loading .wave-bar:nth-child(3) { height: 18px; }
+
+        @keyframes wave-bounce {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.4); }
+        }
+
+        .optimize-label {
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
         }
 
         /* ======== 优化建议 ======== */
@@ -597,6 +795,18 @@
             font-size: 14px;
             color: var(--text-secondary);
             line-height: 1.6;
+        }
+
+        .suggestion-ul {
+            margin: 4px 0 0 0;
+            padding-left: 18px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .suggestion-ul li {
+            margin-bottom: 2px;
         }
 
         /* ======== Offer对比表格 ======== */
@@ -686,6 +896,123 @@
             padding: 2px 6px;
             border-radius: 3px;
             font-weight: 500;
+        }
+
+        /* ======== 优化洞察报告 ======== */
+        .optimize-report {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .report-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .report-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .report-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .kw-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 500;
+            background: rgba(11, 87, 208, 0.08);
+            color: var(--accent);
+        }
+
+        .report-compare {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .report-before, .report-after {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        .report-before {
+            background: #FFF8F0;
+            border-left: 3px solid #E8A838;
+        }
+
+        .report-after {
+            background: #F0F6FF;
+            border-left: 3px solid #0B57D0;
+        }
+
+        .report-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 1px 8px;
+            border-radius: 3px;
+            margin-bottom: 6px;
+        }
+
+        .report-badge.before {
+            background: #F5E6D0;
+            color: #B8781A;
+        }
+
+        .report-badge.after {
+            background: #D0E2FC;
+            color: #0B57D0;
+        }
+
+        /* ======== 优化简历操作按钮 ======== */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: 1px solid #E5E0DA;
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            border-color: #D0CBC5;
+            color: var(--text);
+        }
+
+        .copy-btn.copied {
+            border-color: var(--success);
+            color: var(--success);
+            background: rgba(46, 125, 50, 0.06);
+        }
+
+        .thumb-btn.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(11, 87, 208, 0.06);
+        }
+
+        .thumb-btn.active:hover {
+            border-color: #0949B0;
+            color: #0949B0;
         }
 
         .resume-original {
@@ -918,6 +1245,21 @@
                         </div>
                         <span class="upload-text">点击上传岗位JD (图片/PDF)</span>
                     </div>
+                </div>
+
+                <div id="optimizeAction" style="text-align:center;padding:24px 0 8px;display:none;">
+                    <div class="optimize-circle-wrap" onclick="optimizeResume()">
+                        <div class="optimize-ripple" id="optimizeRipple"></div>
+                        <button class="optimize-circle" id="btnOptimize">
+                            <span class="wave-bars">
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                            </span>
+                        </button>
+                    </div>
+                    <p class="optimize-label" id="optimizeLabel">点击一键优化简历</p>
+                    <p id="optimizeStatus" style="font-size:13px;color:var(--text-tertiary);margin-top:6px;display:none;"></p>
                 </div>
 
                 <!-- 简历优化预览 -->
@@ -1167,9 +1509,11 @@
         const state = {
             resumeText: '',
             jdText: '',
+            optimizedResumeText: '',
             chatHistory1: [],
             chatHistory2: [],
             isAnalyzing: false,
+            isOptimizing: false,
         };
 
         // ======== API 工具函数 ========
@@ -1214,7 +1558,7 @@
 
                 // Show loading
                 const origHTML = zone.innerHTML;
-                zone.innerHTML = `<div class="upload-icon-circle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0B57D0" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span class="upload-text">解析中...</span>`;
+                zone.innerHTML = `<div class="upload-spinner"></div><span class="upload-file-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;">${escapeHtml(file.name)}</span><span class="upload-text" style="font-size:13px;">文件上传中...</span>`;
                 zone.classList.add('uploaded');
 
                 try {
@@ -1263,11 +1607,14 @@
             if (!state.resumeText || !state.jdText) return;
             state.isAnalyzing = true;
 
-            // Show loading state
-            document.getElementById('scoreValue').textContent = '...';
-            document.getElementById('scoreLabel').textContent = '分析中';
-            document.getElementById('compareList').innerHTML = '<div style="font-size:14px;color:var(--text-tertiary);text-align:center;padding:20px;">AI 正在分析...</div>';
-            document.getElementById('suggestionList').innerHTML = '<div style="font-size:14px;color:var(--text-tertiary);text-align:center;padding:20px;">AI 正在生成建议...</div>';
+            // Show loading state with ring animation
+            const fgCircle = document.getElementById('scoreFgCircle');
+            fgCircle.setAttribute('stroke-dashoffset', '283'); // ~75% hidden
+            fgCircle.classList.add('loading-ring');
+            document.getElementById('scoreValue').innerHTML = '<span class="score-loading-dot"></span>';
+            document.getElementById('scoreLabel').textContent = '正在分析...';
+            document.getElementById('compareList').innerHTML = '<div class="loading-placeholder"><span class="loading-shimmer"></span></div>';
+            document.getElementById('suggestionList').innerHTML = '<div class="loading-placeholder"><span class="loading-shimmer"></span></div>';
 
             try {
                 const result = await apiPost('/api/resume/analyze', {
@@ -1275,16 +1622,62 @@
                     jdText: state.jdText,
                 });
 
+                document.getElementById('scoreFgCircle').classList.remove('loading-ring');
                 renderMatchScore(result.score);
                 renderCompareList(result.comparison);
                 renderSuggestions(result.suggestions);
-                renderOptimizedResume(result.optimizedResume, result.score);
+                document.getElementById('optimizeAction').style.display = 'block';
             } catch (err) {
-                document.getElementById('scoreValue').textContent = '--';
+                document.getElementById('scoreFgCircle').classList.remove('loading-ring');
+                document.getElementById('scoreValue').innerHTML = '--';
                 document.getElementById('scoreLabel').textContent = '分析失败';
+                document.getElementById('compareList').innerHTML = '<div style="font-size:14px;color:var(--text-tertiary);text-align:center;padding:20px;">分析失败，请重试</div>';
+                document.getElementById('suggestionList').innerHTML = '<div style="font-size:14px;color:var(--text-tertiary);text-align:center;padding:20px;">分析失败，请重试</div>';
                 alert('简历分析失败：' + err.message);
             } finally {
                 state.isAnalyzing = false;
+            }
+        }
+
+        async function optimizeResume() {
+            if (!state.resumeText || !state.jdText || state.isOptimizing) return;
+            state.isOptimizing = true;
+            const btn = document.getElementById('btnOptimize');
+            const status = document.getElementById('optimizeStatus');
+            const label = document.getElementById('optimizeLabel');
+            const wrap = document.querySelector('.optimize-circle-wrap');
+            const ripple = document.getElementById('optimizeRipple');
+            ripple.classList.remove('done');
+            btn.classList.add('is-loading');
+            label.textContent = '正在深度优化...';
+            status.style.display = 'block';
+            status.textContent = 'AI 正在根据 JD 关键词优化你的简历，请稍候...';
+            wrap.style.pointerEvents = 'none';
+
+            const preview = document.getElementById('resumePreview');
+            preview.style.display = 'block';
+            document.getElementById('resumePreviewTitle').textContent = '正在优化...';
+            document.getElementById('resumePreviewContent').innerHTML = '<div class="loading-dots" style="text-align:center;padding:40px;"><span></span><span></span><span></span></div>';
+
+            try {
+                const result = await apiPost('/api/resume/optimize', {
+                    resumeText: state.resumeText,
+                    jdText: state.jdText,
+                });
+                renderOptimizeReport(result.report);
+                renderOptimizedResume(result.optimizedResume);
+            } catch (err) {
+                document.getElementById('resumePreview').style.display = 'none';
+                status.textContent = '';
+                status.style.display = 'none';
+                alert('简历优化失败：' + err.message);
+            } finally {
+                btn.classList.remove('is-loading');
+                ripple.classList.add('done');
+                label.textContent = '重新优化';
+                status.style.display = 'none';
+                wrap.style.pointerEvents = 'auto';
+                state.isOptimizing = false;
             }
         }
 
@@ -1319,21 +1712,14 @@
 
             container.innerHTML = comparison.map(item => {
                 const s = statusMap[item.status] || statusMap.partial;
-                let detailHTML = escapeHtml(item.detail);
-                // For skills, wrap pairs
-                if (item.element === '岗位技能') {
-                    const pairs = item.detail.split(/\s+/).filter(Boolean);
-                    detailHTML = pairs.map(p =>
-                        `<span class="skill-pair">${escapeHtml(p)}</span>`
-                    ).join('');
-                }
                 return `
                     <div class="compare-item">
-                        <span class="compare-label">${escapeHtml(item.element)}</span>
-                        <div style="text-align:right;">
+                        <div class="compare-item-header">
+                            <span class="compare-label">${escapeHtml(item.element)}</span>
                             <span class="match-status ${s.cls}">${s.icon}</span>
-                            <div class="compare-detail${item.element === '岗位技能' ? ' skills' : ''}">${detailHTML}</div>
                         </div>
+                        <div class="compare-row"><span class="compare-tag jd">JD</span><span>${escapeHtml(item.jdRequirement || '')}</span></div>
+                        <div class="compare-row"><span class="compare-tag you">你</span><span>${escapeHtml(item.yourProfile || '')}</span></div>
                     </div>
                 `;
             }).join('');
@@ -1346,46 +1732,128 @@
                 return;
             }
 
+            const groups = [
+                { key: 'missing', label: '致命缺失点', cls: 'danger' },
+                { key: 'supplement', label: '急需补充点', cls: 'warning' },
+                { key: 'risks', label: '潜在面试风险点', cls: 'info' },
+            ];
+
             const parts = [];
-            if (suggestions.missing && suggestions.missing.length) {
-                parts.push(...suggestions.missing.map(t =>
-                    `<div class="suggestion-item danger"><p class="suggestion-tag">缺失点</p><p class="suggestion-desc">${escapeHtml(t)}</p></div>`
-                ));
-            }
-            if (suggestions.supplement && suggestions.supplement.length) {
-                parts.push(...suggestions.supplement.map(t =>
-                    `<div class="suggestion-item warning"><p class="suggestion-tag">需补充点</p><p class="suggestion-desc">${escapeHtml(t)}</p></div>`
-                ));
-            }
-            if (suggestions.risks && suggestions.risks.length) {
-                parts.push(...suggestions.risks.map(t =>
-                    `<div class="suggestion-item info"><p class="suggestion-tag">风险</p><p class="suggestion-desc">${escapeHtml(t)}</p></div>`
-                ));
-            }
+            groups.forEach(g => {
+                if (suggestions[g.key] && suggestions[g.key].length) {
+                    const items = suggestions[g.key].map(t =>
+                        `<li>${escapeHtml(t)}</li>`
+                    ).join('');
+                    parts.push(`
+                        <div class="suggestion-item ${g.cls}">
+                            <p class="suggestion-tag">${g.label}</p>
+                            <ul class="suggestion-ul">${items}</ul>
+                        </div>
+                    `);
+                }
+            });
 
             container.innerHTML = parts.length ? parts.join('') : '<div style="font-size:14px;color:var(--text-tertiary);text-align:center;padding:20px;">暂无建议</div>';
         }
 
-        function renderOptimizedResume(text, score) {
+        function renderOptimizeReport(report) {
             const preview = document.getElementById('resumePreview');
             const title = document.getElementById('resumePreviewTitle');
             const content = document.getElementById('resumePreviewContent');
 
-            if (!text) {
+            if (!report) {
                 preview.style.display = 'none';
                 return;
             }
 
             preview.style.display = 'block';
-            title.innerHTML = '匹配度 <strong style="color:#0B57D0;">' + score + '%</strong>';
+            title.textContent = '优化洞察报告';
 
-            // Convert markdown-style to HTML, highlight 【】 wrapped text
+            const keywordTags = (report.keywords || []).map(k =>
+                `<span class="kw-tag">${escapeHtml(k)}</span>`
+            ).join('');
+
+            content.innerHTML = `
+                <div class="optimize-report">
+                    <div class="report-block">
+                        <p class="report-label">去除的冗余</p>
+                        <p class="report-text">${escapeHtml(report.removed || '')}</p>
+                    </div>
+                    <div class="report-block">
+                        <p class="report-label">植入的关键词</p>
+                        <div class="report-keywords">${keywordTags || '<span style="color:var(--text-tertiary);">无</span>'}</div>
+                    </div>
+                    <div class="report-block">
+                        <p class="report-label">改写亮点对比</p>
+                        <div class="report-compare">
+                            <div class="report-before"><span class="report-badge before">Before</span><p>${escapeHtml((report.highlight && report.highlight.before) || '')}</p></div>
+                            <div class="report-after"><span class="report-badge after">After</span><p>${escapeHtml((report.highlight && report.highlight.after) || '')}</p></div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="divider" style="margin:20px 0;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                    <p class="report-label" style="margin-bottom:0;">优化后纯净版简历</p>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <button class="action-btn copy-btn" onclick="copyOptimizedResume()" title="复制简历">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        </button>
+                        <button class="action-btn thumb-btn" id="btnThumbUp" onclick="feedbackResume('up')" title="赞">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3m7-2V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14Z"/></svg>
+                        </button>
+                        <button class="action-btn thumb-btn" id="btnThumbDown" onclick="feedbackResume('down')" title="踩">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="transform:scale(-1,-1);"><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3m7-2V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14Z"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="optimizedResumeText" style="font-size:16px;line-height:1.8;color:var(--text);"></div>
+            `;
+        }
+
+        function renderOptimizedResume(text) {
+            if (!text) return;
+            const container = document.getElementById('optimizedResumeText');
+            if (!container) return;
+
+            // Store plain text for copy
+            state.optimizedResumeText = text;
+
             let html = escapeHtml(text)
                 .replace(/【(.+?)】/g, '<span class="resume-highlight-diff">$1</span>')
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\n/g, '<br>');
 
-            content.innerHTML = html;
+            container.innerHTML = html;
+        }
+
+        async function copyOptimizedResume() {
+            if (!state.optimizedResumeText) return;
+            try {
+                // Strip 【】 markers for clean copy
+                const cleanText = state.optimizedResumeText.replace(/【|】/g, '');
+                await navigator.clipboard.writeText(cleanText);
+                const btn = document.querySelector('.copy-btn');
+                btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+                    btn.classList.remove('copied');
+                }, 2000);
+            } catch {
+                alert('复制失败，请手动选中复制');
+            }
+        }
+
+        function feedbackResume(type) {
+            const upBtn = document.getElementById('btnThumbUp');
+            const downBtn = document.getElementById('btnThumbDown');
+            if (type === 'up') {
+                upBtn.classList.toggle('active');
+                downBtn.classList.remove('active');
+            } else {
+                downBtn.classList.toggle('active');
+                upBtn.classList.remove('active');
+            }
         }
 
         // ======== 模块切换 ========
