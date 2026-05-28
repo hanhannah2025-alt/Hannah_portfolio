@@ -487,6 +487,70 @@ app.post('/api/offer/chat', async (req, res) => {
 });
 
 
+// 6. Email verification code (nodemailer + QQ邮箱)
+const nodemailer = require('nodemailer');
+const codeStore = new Map(); // email -> { code, expires }
+
+const transporter = nodemailer.createTransport({
+  service: 'qq',
+  auth: {
+    user: process.env.EMAIL_USER || '',
+    pass: process.env.EMAIL_PASS || '',
+  },
+});
+
+app.post('/api/send-code', async (req, res) => {
+  const { email } = req.body;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: '请输入有效的邮箱地址' });
+  }
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS ||
+      process.env.EMAIL_USER === 'your_email@qq.com') {
+    // Fallback to mock mode
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    codeStore.set(email, { code, expires: Date.now() + 5 * 60 * 1000 });
+    console.log(`[验证码-模拟] ${email} → ${code}`);
+    return res.json({ success: true, msg: '验证码已发送（模拟模式，查看控制台）' });
+  }
+
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  codeStore.set(email, { code, expires: Date.now() + 5 * 60 * 1000 });
+
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: '职途导航 - 登录验证码',
+      text: `您的验证码是：${code}，5分钟内有效。`,
+      html: `<div style="font-family:sans-serif;max-width:400px;margin:0 auto;">
+        <h3 style="color:#0B57D0;">职途导航</h3>
+        <p>您的登录验证码是：</p>
+        <p style="font-size:28px;font-weight:700;letter-spacing:4px;color:#333;">${code}</p>
+        <p style="color:#999;font-size:13px;">5分钟内有效，请勿泄露给他人。</p>
+      </div>`,
+    });
+    console.log(`[验证码-邮件] ${email} → ${code}`);
+    res.json({ success: true, msg: '验证码已发送至邮箱' });
+  } catch (err) {
+    console.error('Send email error:', err.message);
+    codeStore.delete(email);
+    res.status(500).json({ error: '邮件发送失败：' + err.message });
+  }
+});
+
+app.post('/api/verify-code', (req, res) => {
+  const { email, code } = req.body;
+  const entry = codeStore.get(email);
+  if (!entry) return res.status(400).json({ error: '请先获取验证码' });
+  if (Date.now() > entry.expires) {
+    codeStore.delete(email);
+    return res.status(400).json({ error: '验证码已过期，请重新获取' });
+  }
+  if (entry.code !== String(code)) return res.status(400).json({ error: '验证码错误' });
+  codeStore.delete(email);
+  res.json({ success: true });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', model: MODEL });

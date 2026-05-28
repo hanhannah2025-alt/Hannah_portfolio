@@ -153,6 +153,278 @@
             transition: color 0.25s ease;
         }
 
+        /* ======== 历史记录 ======== */
+        .sidebar-history {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            margin-top: var(--sidebar-gap);
+            padding: 0 16px;
+            overflow: hidden;
+        }
+
+        .sidebar-history-title {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text);
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+            font-weight: 500;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            transition: all 0.25s ease;
+        }
+
+        .sidebar-history-title:hover {
+            background: rgba(11, 87, 208, 0.12);
+        }
+
+        .sidebar-history-title svg {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            transition: transform 0.25s ease;
+        }
+
+        .sidebar-history-title svg path,
+        .sidebar-history-title svg line,
+        .sidebar-history-title svg polyline {
+            stroke: var(--text);
+            transition: stroke 0.25s ease;
+        }
+
+        .sidebar-history-title:hover svg path,
+        .sidebar-history-title:hover svg line,
+        .sidebar-history-title:hover svg polyline {
+            stroke: var(--accent);
+        }
+
+        .sidebar-history-title:hover .history-label {
+            color: var(--accent);
+        }
+
+        .sidebar-history-title .arrow-down {
+            margin-left: auto;
+            transition: transform 0.25s ease;
+        }
+
+        .sidebar-history-title.expanded .arrow-down {
+            transform: rotate(180deg);
+        }
+
+        .sidebar-history-list {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .sidebar-history-list::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .sidebar-history-list::-webkit-scrollbar-thumb {
+            background: #DDD;
+            border-radius: 3px;
+        }
+
+        .sidebar-history.collapsed .sidebar-history-list {
+            display: none;
+        }
+
+        .sidebar-history.collapsed {
+            flex: 0 0 auto;
+        }
+
+        .history-item {
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            transition: all 0.2s;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .history-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .history-item .history-time {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            display: block;
+            margin-top: 2px;
+        }
+
+        .history-empty {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-align: center;
+            padding: 16px 0;
+        }
+
+        /* ======== 侧边栏底部用户区 ======== */
+        .sidebar-user {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: auto 8px 8px;
+            border-radius: 10px;
+        }
+
+        .sidebar-user:hover {
+            background: var(--hover-bg);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .user-avatar.logged-out {
+            background: #CCC;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .user-action {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        /* ======== 登录弹窗 ======== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 14px;
+            padding: 32px;
+            width: 360px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+        }
+
+        .modal-box h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            margin-bottom: 16px;
+        }
+
+        .modal-input:focus {
+            border-color: var(--accent);
+        }
+
+        .code-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .code-input {
+            flex: 1;
+            margin-bottom: 0 !important;
+        }
+
+        .send-code-btn {
+            white-space: nowrap;
+            background: var(--bg);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .send-code-btn:disabled {
+            color: var(--text-tertiary);
+            border-color: var(--border);
+            cursor: not-allowed;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .modal-btn.primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .modal-btn.ghost {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
         /* ======== 主内容区 ======== */
         .main-content {
             flex: 1;
@@ -1622,7 +1894,55 @@
                 <span class="nav-label">Offer 对比</span>
             </button>
         </nav>
+
+        <!-- 历史记录 -->
+        <div class="sidebar-history" id="sidebarHistory">
+            <div class="sidebar-history-title expanded" id="historyTitle" onclick="toggleHistory()" title="展开/收起历史记录">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span class="history-label">历史记录</span>
+                <svg class="arrow-down" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </div>
+            <div class="sidebar-history-list" id="historyList">
+                <div class="history-empty">暂无历史记录</div>
+            </div>
+        </div>
+
+        <!-- 用户区 -->
+        <div class="sidebar-user" id="sidebarUser" onclick="toggleLogin()">
+            <div class="user-avatar logged-out" id="userAvatar">?</div>
+            <div class="user-info">
+                <div class="user-name" id="userName">未登录</div>
+                <div class="user-action" id="userAction">点击登录</div>
+            </div>
+        </div>
     </aside>
+
+    <!-- 登录弹窗 -->
+    <div class="modal-overlay" id="loginModal" style="display:none;">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <h3 id="loginTitle">邮箱登录</h3>
+            <div id="loginFormContent">
+                <input class="modal-input" id="emailInput" placeholder="请输入邮箱地址" maxlength="50" autocomplete="off" type="email">
+                <div class="code-row">
+                    <input class="modal-input code-input" id="codeInput" placeholder="验证码" maxlength="6" autocomplete="off" type="text">
+                    <button class="modal-btn send-code-btn" id="btnSendCode" onclick="sendVerifyCode()">获取验证码</button>
+                </div>
+            </div>
+            <div id="logoutContent" style="display:none;">
+                <p style="color:var(--text-secondary);font-size:14px;margin-bottom:20px;" id="loggedEmail"></p>
+            </div>
+            <div class="modal-btns">
+                <button class="modal-btn ghost" id="btnLogout" style="display:none;" onclick="doLogout()">退出登录</button>
+                <button class="modal-btn ghost" onclick="closeLogin()">取消</button>
+                <button class="modal-btn primary" id="btnLogin" onclick="doLogin()">登录</button>
+            </div>
+        </div>
+    </div>
 
     <!-- ======== 模块1：简历匹配优化 ======== -->
     <div class="module active" id="module-0">
@@ -2889,6 +3209,234 @@
 
         // 初始化面试模块输入状态
         checkInterviewReady();
+
+        // ======== 历史记录 ========
+        const HISTORY_KEY = 'career_nav_history';
+        const USER_KEY = 'career_nav_user';
+
+        function loadHistory() {
+            try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+            catch (e) { return []; }
+        }
+
+        function saveHistory(list) {
+            // Keep last 50 entries
+            if (list.length > 50) list = list.slice(-50);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+        }
+
+        function addHistoryEntry(module, title, messages) {
+            const list = loadHistory();
+            list.push({
+                id: Date.now(),
+                module,
+                title: title.slice(0, 40),
+                messages: messages.slice(-2), // keep first user + last AI reply
+                time: new Date().toISOString()
+            });
+            saveHistory(list);
+            renderHistory();
+        }
+
+        function toggleHistory() {
+            const el = document.getElementById('sidebarHistory');
+            const title = document.getElementById('historyTitle');
+            el.classList.toggle('collapsed');
+            title.classList.toggle('expanded');
+        }
+
+        function clearHistory() {
+            if (!confirm('确定清空所有历史记录？')) return;
+            localStorage.removeItem(HISTORY_KEY);
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const list = loadHistory();
+            const el = document.getElementById('historyList');
+            if (!list.length) {
+                el.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+                return;
+            }
+            const moduleNames = ['简历', '面试', 'Offer'];
+            el.innerHTML = list.slice().reverse().map(h => {
+                const d = new Date(h.time);
+                const timeStr = (d.getMonth() + 1) + '/' + d.getDate() + ' ' +
+                    String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+                return '<div class="history-item" data-id="' + h.id + '" onclick="loadHistoryEntry(' + h.id + ')" title="' + escapeHtml(h.title) + '">' +
+                    escapeHtml(h.title || '(空)') +
+                    '<span class="history-time">' + moduleNames[h.module] + ' · ' + timeStr + '</span></div>';
+            }).join('');
+        }
+
+        let _historyLoading = false;
+
+        function loadHistoryEntry(id) {
+            const list = loadHistory();
+            const entry = list.find(h => h.id === id);
+            if (!entry) return;
+            // Switch to that module
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(n => n.classList.remove('active'));
+            const target = document.querySelector('.nav-item[data-module="' + entry.module + '"]');
+            if (target) target.classList.add('active');
+            const modules = document.querySelectorAll('.module');
+            modules.forEach(m => m.classList.remove('active'));
+            modules[entry.module].classList.add('active');
+            // Restore messages without recording to history
+            const messagesId = 'chatMessages' + (entry.module === 2 ? 2 : (entry.module === 1 ? 1 : 0));
+            const messagesEl = document.getElementById(messagesId);
+            if (messagesEl && entry.messages) {
+                _historyLoading = true;
+                messagesEl.innerHTML = '';
+                entry.messages.forEach(m => origAddChatMessage(entry.module === 2 ? 2 : (entry.module === 1 ? 1 : 0), m.role, m.content));
+                _historyLoading = false;
+            }
+        }
+
+        renderHistory();
+
+        // ======== 用户登录 ========
+        function loadUser() {
+            try { return JSON.parse(localStorage.getItem(USER_KEY)) || { email: '', loggedIn: false }; }
+            catch (e) { return { email: '', loggedIn: false }; }
+        }
+
+        function saveUser(user) {
+            localStorage.setItem(USER_KEY, JSON.stringify(user));
+        }
+
+        function renderUser() {
+            const user = loadUser();
+            const avatar = document.getElementById('userAvatar');
+            const name = document.getElementById('userName');
+            const action = document.getElementById('userAction');
+            if (user.loggedIn && user.email) {
+                avatar.textContent = user.email.charAt(0).toUpperCase();
+                avatar.classList.remove('logged-out');
+                name.textContent = user.email.split('@')[0];
+                action.textContent = '点击退出';
+            } else {
+                avatar.textContent = '?';
+                avatar.classList.add('logged-out');
+                name.textContent = '未登录';
+                action.textContent = '点击登录';
+            }
+        }
+
+        let countdownTimer = null;
+
+        async function sendVerifyCode() {
+            const email = document.getElementById('emailInput').value.trim();
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert('请输入有效的邮箱地址');
+                return;
+            }
+            const btn = document.getElementById('btnSendCode');
+            btn.disabled = true;
+            try {
+                const res = await apiPost('/api/send-code', { email });
+                if (!res.success) { alert(res.error); btn.disabled = false; return; }
+                let sec = 60;
+                btn.textContent = sec + 's';
+                countdownTimer = setInterval(() => {
+                    sec--;
+                    if (sec <= 0) {
+                        clearInterval(countdownTimer);
+                        btn.textContent = '获取验证码';
+                        btn.disabled = false;
+                    } else {
+                        btn.textContent = sec + 's';
+                    }
+                }, 1000);
+            } catch (err) {
+                alert('发送失败：' + err.message);
+                btn.disabled = false;
+            }
+        }
+
+        function toggleLogin() {
+            const user = loadUser();
+            const modal = document.getElementById('loginModal');
+            const formContent = document.getElementById('loginFormContent');
+            const logoutContent = document.getElementById('logoutContent');
+            const btnLogin = document.getElementById('btnLogin');
+            const btnLogout = document.getElementById('btnLogout');
+            const title = document.getElementById('loginTitle');
+            if (user.loggedIn && user.email) {
+                title.textContent = '已登录';
+                formContent.style.display = 'none';
+                logoutContent.style.display = 'block';
+                document.getElementById('loggedEmail').textContent = user.email;
+                btnLogin.style.display = 'none';
+                btnLogout.style.display = 'inline-block';
+            } else {
+                title.textContent = '邮箱登录';
+                formContent.style.display = 'block';
+                logoutContent.style.display = 'none';
+                document.getElementById('emailInput').value = '';
+                document.getElementById('codeInput').value = '';
+                btnLogin.style.display = 'inline-block';
+                btnLogout.style.display = 'none';
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeLogin() {
+            document.getElementById('loginModal').style.display = 'none';
+            if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+            const btn = document.getElementById('btnSendCode');
+            btn.textContent = '获取验证码';
+            btn.disabled = false;
+        }
+
+        async function doLogin() {
+            const email = document.getElementById('emailInput').value.trim();
+            const code = document.getElementById('codeInput').value.trim();
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('请输入有效的邮箱地址'); return; }
+            if (!code) { alert('请输入验证码'); return; }
+            try {
+                const res = await apiPost('/api/verify-code', { email, code });
+                if (!res.success) { alert(res.error); return; }
+                saveUser({ email, loggedIn: true });
+                renderUser();
+                closeLogin();
+            } catch (err) {
+                alert('验证失败：' + err.message);
+            }
+        }
+
+        function doLogout() {
+            saveUser({ email: '', loggedIn: false });
+            renderUser();
+            closeLogin();
+        }
+
+        // Close modal on overlay click
+        document.getElementById('loginModal').addEventListener('click', closeLogin);
+
+        renderUser();
+
+        // Hook: save history on chat messages
+        const origAddChatMessage = addChatMessage;
+        addChatMessage = function(moduleNum, role, content) {
+            const result = origAddChatMessage(moduleNum, role, content);
+            if (_historyLoading) return result;
+            if (role === 'user') {
+                addHistoryEntry(moduleNum, content, []);
+            }
+            if (role === 'ai') {
+                const list = loadHistory();
+                if (list.length) {
+                    const last = list[list.length - 1];
+                    if (!last.messages) last.messages = [];
+                    last.messages.push({ role, content });
+                    saveHistory(list);
+                    renderHistory();
+                }
+            }
+            return result;
+        };
     </script>
 </body>
 </html>
