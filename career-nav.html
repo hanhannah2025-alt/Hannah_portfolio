@@ -435,6 +435,27 @@
             pointer-events: none;
         }
 
+        .chat-plus-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--text-secondary);
+            transition: all 0.25s ease;
+        }
+
+        .chat-plus-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(11, 87, 208, 0.04);
+        }
+
         .chat-input:disabled {
             opacity: 0.45;
             cursor: not-allowed;
@@ -581,6 +602,26 @@
             color: var(--text);
             flex-shrink: 0;
             white-space: nowrap;
+        }
+
+        .compare-unknown {
+            font-size: 15px;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        .placeholder-hint {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            text-align: center;
+            padding: 20px 0;
+            line-height: 1.5;
+        }
+
+        .compare-placeholder .compare-item {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .compare-row {
@@ -1459,10 +1500,14 @@
                 <div>
                     <p class="panel-section-title">要素对比</p>
                     <div class="compare-list" id="compareList">
-                        <div class="compare-item">
-                            <span class="compare-label">学历</span>
-                            <div style="text-align:right;color:var(--text-tertiary);">上传简历后自动分析</div>
+                        <div class="compare-placeholder">
+                            <div class="compare-item"><span class="compare-label">学历</span><span class="compare-unknown">--</span></div>
+                            <div class="compare-item"><span class="compare-label">专业</span><span class="compare-unknown">--</span></div>
+                            <div class="compare-item"><span class="compare-label">经验要求</span><span class="compare-unknown">--</span></div>
+                            <div class="compare-item"><span class="compare-label">岗位技能</span><span class="compare-unknown">--</span></div>
+                            <div class="compare-item"><span class="compare-label">项目经历</span><span class="compare-unknown">--</span></div>
                         </div>
+                        <p class="placeholder-hint">上传简历和JD后自动分析</p>
                     </div>
                 </div>
 
@@ -1472,7 +1517,7 @@
                 <div>
                     <p class="panel-section-title">优化建议</p>
                     <div class="suggestion-list" id="suggestionList">
-                        <div style="font-size:14px;color:var(--text-tertiary);text-align:center;padding:20px;">上传简历后自动生成建议</div>
+                        <p class="placeholder-hint">上传简历和JD后自动生成建议</p>
                     </div>
                 </div>
             </div>
@@ -1592,6 +1637,11 @@
                         </div>
                     </div>
                     <div class="chat-input-area">
+                        <button class="chat-plus-btn" id="btnOfferUpload" title="上传Offer截图" onclick="document.getElementById('fileOffer').click()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                        </button>
                         <textarea class="chat-input" placeholder="输入你的问题或想法..." rows="1" id="chatInput2"></textarea>
                         <button class="chat-send-btn" onclick="sendMessage(2)">
                             <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
@@ -1605,80 +1655,25 @@
 
             <!-- 右侧面板：Offer对比表格 -->
             <div class="right-panel">
-                <div>
+                <div id="offerTableSection">
                     <p class="panel-section-title">Offer 结构化对比</p>
-                    <table class="offer-table" style="margin-top:12px;">
-                        <thead>
-                            <tr>
-                                <th>对比维度</th>
-                                <th>Offer A<br><span style="font-weight:400;font-size:11px;">字节跳动</span></th>
-                                <th>Offer B<br><span style="font-weight:400;font-size:11px;">阿里巴巴</span></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="dimension">企业职位</td>
-                                <td>高级产品经理</td>
-                                <td>高级产品经理</td>
-                            </tr>
-                            <tr>
-                                <td class="dimension">工作地点</td>
-                                <td>北京</td>
-                                <td>杭州</td>
-                            </tr>
-                            <tr>
-                                <td class="dimension">年化总包</td>
-                                <td>45万<span class="offer-highlight warn" style="margin-left:4px;">低7万</span></td>
-                                <td>52万<span class="offer-highlight best" style="margin-left:4px;">最高</span></td>
-                            </tr>
-                            <tr>
-                                <td class="dimension">月薪</td>
-                                <td>30,000/月</td>
-                                <td>32,500/月</td>
-                            </tr>
-                            <tr>
-                                <td class="dimension">预估真实时薪</td>
-                                <td><strong>144元/h</strong></td>
-                                <td><strong>156元/h</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="dimension">五险一金质量</td>
-                                <td><span class="offer-highlight best">全额缴纳</span></td>
-                                <td><span class="offer-highlight warn">最低基数</span></td>
-                            </tr>
-                            <tr>
-                                <td class="dimension">公积金/月<br><span style="font-weight:400;font-size:11px;">(个人+公司)</span></td>
-                                <td><strong>7,200元</strong></td>
-                                <td><strong>约2,800元</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="dimension">年终奖金</td>
-                                <td>3个月（15薪）</td>
-                                <td>4个月（16薪）</td>
-                            </tr>
-                            <tr>
-                                <td class="dimension">简历流通溢价</td>
-                                <td><span class="offer-highlight best">较高</span></td>
-                                <td>中等</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div id="offerTableContainer">
+                        <p class="placeholder-hint">在左侧输入Offer信息或上传截图，自动生成结构化对比</p>
+                    </div>
                 </div>
 
-                <hr class="divider">
+                <hr class="divider" id="offerDivider" style="display:none;">
 
-                <div>
+                <div id="offerOutlookSection" style="display:none;">
+                    <p class="panel-section-title">行业与岗位前景</p>
+                    <div id="offerOutlookContent"></div>
+                </div>
+
+                <hr class="divider" id="offerSuggestionDivider" style="display:none;">
+
+                <div id="offerSuggestionSection" style="display:none;">
                     <p class="panel-section-title">决策建议</p>
-                    <div class="suggestion-list">
-                        <div class="suggestion-item info">
-                            <p class="suggestion-tag">综合推荐</p>
-                            <p class="suggestion-desc">若看重长期发展与福利保障，<strong>字节跳动</strong>的全额五险一金和扁平文化更适合你。</p>
-                        </div>
-                        <div class="suggestion-item warning">
-                            <p class="suggestion-tag">需要关注</p>
-                            <p class="suggestion-desc">阿里的最低基数缴纳将显著影响你的<strong>公积金积累</strong>和<strong>养老金</strong>水平。</p>
-                        </div>
-                    </div>
+                    <div class="suggestion-list" id="offerSuggestionList"></div>
                 </div>
             </div>
         </div>
@@ -1689,6 +1684,7 @@
     <input type="file" id="fileJD" accept=".png,.jpg,.jpeg,.webp,.bmp,.pdf,.txt" style="display:none;">
     <input type="file" id="fileInterviewResume" accept=".pdf" style="display:none;">
     <input type="file" id="fileInterviewJD" accept=".png,.jpg,.jpeg,.webp,.bmp,.pdf,.txt" style="display:none;">
+    <input type="file" id="fileOffer" accept=".png,.jpg,.jpeg,.webp,.bmp" style="display:none;">
 
     <script>
         // ======== 状态管理 ========
@@ -1703,6 +1699,7 @@
             isOptimizing: false,
             interviewPredict: null,
             practicedCount: 0,
+            offerData: null,
         };
 
         // ======== API 工具函数 ========
@@ -1897,7 +1894,7 @@
         function renderCompareList(comparison) {
             const container = document.getElementById('compareList');
             if (!comparison || !comparison.length) {
-                container.innerHTML = '<div style="font-size:14px;color:var(--text-tertiary);text-align:center;padding:20px;">暂无数据</div>';
+                container.innerHTML = '<p class="placeholder-hint">暂无数据</p>';
                 return;
             }
 
@@ -1925,7 +1922,7 @@
         function renderSuggestions(suggestions) {
             const container = document.getElementById('suggestionList');
             if (!suggestions) {
-                container.innerHTML = '<div style="font-size:14px;color:var(--text-tertiary);text-align:center;padding:20px;">暂无建议</div>';
+                container.innerHTML = '<p class="placeholder-hint">暂无建议</p>';
                 return;
             }
 
@@ -1950,7 +1947,7 @@
                 }
             });
 
-            container.innerHTML = parts.length ? parts.join('') : '<div style="font-size:14px;color:var(--text-tertiary);text-align:center;padding:20px;">暂无建议</div>';
+            container.innerHTML = parts.length ? parts.join('') : '<p class="placeholder-hint">暂无建议</p>';
         }
 
         function renderOptimizeReport(report) {
@@ -2167,6 +2164,12 @@
                 addChatMessage(moduleNum, 'ai', replyHTML);
                 state[historyKey].push({ role: 'assistant', content: result.reply });
 
+                // Module 2: auto-detect offer text and analyze
+                if (moduleNum === 2 && text.length > 30 &&
+                    /(月薪|年薪|薪资|总包|公司|岗位|五险一金|公积金|年终|offer|入职|base|bonus)/i.test(text)) {
+                    analyzeOffers([text]).catch(() => {});
+                }
+
                 // Track interview progress
                 if (moduleNum === 1 && state.interviewPredict) {
                     updateInterviewProgress();
@@ -2309,6 +2312,187 @@
             const total = state.interviewPredict.totalCount || state.interviewPredict.questions.length;
             document.getElementById('infoProgress').textContent = state.practicedCount + ' / ' + total + ' 题';
         }
+
+        // ======== Offer 截图上传处理 ========
+        const fileOffer = document.getElementById('fileOffer');
+        if (fileOffer) {
+            fileOffer.addEventListener('change', async () => {
+                const file = fileOffer.files[0];
+                if (!file) return;
+
+                const btn = document.getElementById('btnOfferUpload');
+                const origHTML = btn.innerHTML;
+                btn.innerHTML = '<div class="btn-spinner" style="width:14px;height:14px;"></div>';
+                btn.disabled = true;
+
+                try {
+                    const result = await uploadFile(file, 'Offer截图');
+                    // Put OCR text into chat input and trigger analysis
+                    const input = document.getElementById('chatInput2');
+                    input.value = result.text;
+                    addChatMessage(2, 'user', '[上传了Offer截图]');
+                    // Auto-analyze
+                    await analyzeOffers([result.text]);
+                } catch (err) {
+                    alert('截图解析失败：' + err.message);
+                } finally {
+                    btn.innerHTML = origHTML;
+                    btn.disabled = false;
+                    fileOffer.value = '';
+                }
+            });
+        }
+
+        // ======== Offer 分析 ========
+        async function analyzeOffers(offerTexts) {
+            if (!offerTexts || !offerTexts.length) return;
+
+            // Show loading in table
+            document.getElementById('offerTableContainer').innerHTML = '<p class="placeholder-hint">正在分析Offer信息...</p>';
+            document.getElementById('offerDivider').style.display = 'none';
+            document.getElementById('offerOutlookSection').style.display = 'none';
+            document.getElementById('offerSuggestionDivider').style.display = 'none';
+            document.getElementById('offerSuggestionSection').style.display = 'none';
+
+            try {
+                const result = await apiPost('/api/offer/analyze', { offerTexts });
+                state.offerData = result;
+                renderOfferTable(result);
+                renderOfferOutlook(result);
+                renderOfferSuggestions(result);
+            } catch (err) {
+                document.getElementById('offerTableContainer').innerHTML = '<p class="placeholder-hint">分析失败：' + escapeHtml(err.message) + '</p>';
+            }
+        }
+
+        // ======== Offer 表格渲染 ========
+        function renderOfferTable(data) {
+            if (!data || !data.offers || !data.offers.length) {
+                document.getElementById('offerTableContainer').innerHTML = '<p class="placeholder-hint">未识别到Offer信息</p>';
+                return;
+            }
+
+            const offers = data.offers;
+            const labels = ['A', 'B', 'C', 'D'];
+
+            // Build thead
+            let headerCells = '<th>对比维度</th>';
+            offers.forEach((o, i) => {
+                headerCells += `<th>Offer ${labels[i]}<br><span style="font-weight:400;font-size:11px;">${escapeHtml(o.company || '未知')}</span></th>`;
+            });
+            // Highlight best/worst values
+            const annualPackages = offers.map(o => o.annualPackage);
+            const monthlySalaries = offers.map(o => o.monthlySalary);
+            const hourlyRates = offers.map(o => o.hourlyRate);
+            const maxAnnual = Math.max(...annualPackages);
+            const minAnnual = Math.min(...annualPackages);
+            const maxMonthly = Math.max(...monthlySalaries);
+
+            function annualCell(o) {
+                let html = o.annualPackage ? o.annualPackage + '万' : '--';
+                if (offers.length >= 2) {
+                    if (o.annualPackage === maxAnnual) html += '<span class="offer-highlight best" style="margin-left:4px;">最高</span>';
+                    else if (o.annualPackage === minAnnual) html += '<span class="offer-highlight warn" style="margin-left:4px;">低' + (maxAnnual - o.annualPackage) + '万</span>';
+                }
+                return html;
+            }
+
+            function monthlyCell(o) {
+                let html = o.monthlySalary ? o.monthlySalary.toLocaleString() + '/月' : '--';
+                if (offers.length >= 2 && o.monthlySalary === maxMonthly) html += '<span class="offer-highlight best" style="margin-left:4px;">最高</span>';
+                return html;
+            }
+
+            const maxHourly = Math.max(...hourlyRates.filter(r => r > 0));
+
+            function hourlyCell(o) {
+                if (!o.hourlyRate) return '--';
+                let html = '<strong>' + o.hourlyRate + '元/h</strong>';
+                if (o.workSchedule) html += '<br><span style="font-size:11px;color:var(--text-tertiary);">(' + escapeHtml(o.workSchedule) + ')</span>';
+                if (offers.length >= 2 && o.hourlyRate === maxHourly && maxHourly > 0) html += '<span class="offer-highlight best" style="margin-left:4px;">最高</span>';
+                return html;
+            }
+
+            function insuranceCell(o) {
+                const val = o.insuranceBase || '--';
+                if (val.includes('全额')) return '<span class="offer-highlight best">' + escapeHtml(val) + '</span>';
+                if (val.includes('最低') || val.includes('不缴')) return '<span class="offer-highlight warn">' + escapeHtml(val) + '</span>';
+                return escapeHtml(val);
+            }
+
+            const rows = [
+                { label: '企业职位', field: 'position', render: o => escapeHtml(o.position || '--') },
+                { label: '工作地点', field: 'location', render: o => escapeHtml(o.location || '--') },
+                { label: '年化总包', field: 'annualPackage', render: o => annualCell(o) },
+                { label: '月薪', field: 'monthlySalary', render: o => monthlyCell(o) },
+                { label: '预估真实时薪', field: 'hourlyRate', render: o => hourlyCell(o) },
+                { label: '工作时制', field: 'workSchedule', render: o => escapeHtml(o.workSchedule || '--') },
+                { label: '五险一金质量', field: 'insuranceBase', render: o => insuranceCell(o) },
+                { label: '公积金/月<br><span style="font-weight:400;font-size:11px;">(个人+公司)</span>', field: 'housingFundMonthly', render: o => o.housingFundMonthly ? '<strong>' + o.housingFundMonthly.toLocaleString() + '元</strong>' : '--' },
+                { label: '年终奖金', field: 'bonus', render: o => escapeHtml(o.bonus || '--') },
+                { label: '简历流通溢价', field: 'resumeValue', render: o => {
+                    const val = o.resumeValue || '--';
+                    if (val.includes('较高') || val.includes('高')) return '<span class="offer-highlight best">' + escapeHtml(val) + '</span>';
+                    return escapeHtml(val);
+                }},
+            ];
+
+            const tbody = rows.map(row =>
+                '<tr><td class="dimension">' + row.label + '</td>' +
+                offers.map((o, oi) => '<td contenteditable="true" data-offer="' + oi + '" data-field="' + row.field + '">' + row.render(o) + '</td>').join('') +
+                '</tr>'
+            ).join('');
+
+            const tableHTML = `
+                <table class="offer-table" style="margin-top:12px;">
+                    <thead><tr>${headerCells}</tr></thead>
+                    <tbody>${tbody}</tbody>
+                </table>
+                <p style="font-size:11px;color:var(--text-tertiary);text-align:center;margin-top:8px;">点击单元格可编辑修改</p>
+            `;
+
+            document.getElementById('offerTableContainer').innerHTML = tableHTML;
+            document.getElementById('offerDivider').style.display = 'block';
+        }
+
+        // ======== Offer 前景渲染 ========
+        function renderOfferOutlook(data) {
+            if (!data || !data.outlook) return;
+            const o = data.outlook;
+            const items = [];
+            if (o.industry) items.push('<div class="suggestion-item info"><p class="suggestion-tag">行业前景</p><p class="suggestion-desc">' + escapeHtml(o.industry) + '</p></div>');
+            if (o.companyGrowth) items.push('<div class="suggestion-item info"><p class="suggestion-tag">公司发展</p><p class="suggestion-desc">' + escapeHtml(o.companyGrowth) + '</p></div>');
+            if (o.roleGrowth) items.push('<div class="suggestion-item info"><p class="suggestion-tag">岗位成长</p><p class="suggestion-desc">' + escapeHtml(o.roleGrowth) + '</p></div>');
+            if (items.length) {
+                document.getElementById('offerOutlookContent').innerHTML = '<div class="suggestion-list">' + items.join('') + '</div>';
+                document.getElementById('offerOutlookSection').style.display = 'block';
+            }
+        }
+
+        // ======== Offer 建议渲染 ========
+        function renderOfferSuggestions(data) {
+            if (!data || !data.suggestion) return;
+            const s = data.suggestion;
+            const items = [];
+            if (s.recommend) items.push('<div class="suggestion-item info"><p class="suggestion-tag">综合推荐</p><p class="suggestion-desc">' + escapeHtml(s.recommend) + '</p></div>');
+            if (s.warning) items.push('<div class="suggestion-item warning"><p class="suggestion-tag">需要关注</p><p class="suggestion-desc">' + escapeHtml(s.warning) + '</p></div>');
+            if (items.length) {
+                document.getElementById('offerSuggestionList').innerHTML = items.join('');
+                document.getElementById('offerSuggestionDivider').style.display = 'block';
+                document.getElementById('offerSuggestionSection').style.display = 'block';
+            }
+        }
+
+        // ======== Offer 表格编辑同步 ========
+        document.getElementById('offerTableContainer').addEventListener('input', (e) => {
+            const td = e.target.closest('td[contenteditable]');
+            if (!td || !state.offerData) return;
+            const oi = parseInt(td.dataset.offer);
+            const field = td.dataset.field;
+            if (!isNaN(oi) && field && state.offerData.offers[oi]) {
+                state.offerData.offers[oi][field] = td.textContent.trim();
+            }
+        });
 
         // ======== 输入框自动调整高度 ========
         document.querySelectorAll('.chat-input').forEach(textarea => {
