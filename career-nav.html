@@ -993,6 +993,60 @@
             margin-bottom: 2px;
         }
 
+        /* ======== 企业背景卡片 ======== */
+        .company-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .company-card .company-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .company-bg-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #F0EDE8;
+        }
+
+        .company-bg-row:last-child {
+            border-bottom: none;
+        }
+
+        .company-bg-label {
+            color: var(--text-tertiary);
+            white-space: nowrap;
+            min-width: 60px;
+        }
+
+        .company-bg-value {
+            color: var(--text);
+            text-align: right;
+            line-height: 1.5;
+        }
+
+        .company-card .company-loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        .company-card .company-empty {
+            text-align: center;
+            padding: 16px;
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
         /* ======== Offer对比表格 ======== */
         #offerTableContainer {
             overflow-x: auto;
@@ -1806,7 +1860,6 @@
                     <div class="panel-title-row">
                         <p class="panel-section-title">Offer 结构化对比</p>
                         <button class="offer-col-btn" id="btnAddOfferCol" title="添加Offer列" onclick="addOfferColumn()">+ 添加Offer</button>
-                        <button class="offer-col-btn offer-analyze-btn" onclick="analyzeManualData()">分析</button>
                     </div>
                     <div id="offerTableContainer">
                         <p class="placeholder-hint">在左侧输入Offer信息或上传截图，自动生成结构化对比</p>
@@ -1826,6 +1879,14 @@
                     <p class="panel-section-title">决策建议</p>
                     <div class="suggestion-list" id="offerSuggestionList"></div>
                 </div>
+
+                <hr class="divider" id="offerCompanyDivider" style="display:none;">
+
+                <div id="offerCompanySection" style="display:none;">
+                    <p class="panel-section-title">企业背景</p>
+                    <div id="offerCompanyContent"></div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -2226,6 +2287,10 @@
                         document.getElementById('startInterviewAction').style.display = 'block';
                     }
                 }
+                // 切换到Offer模块时恢复企业背景渲染
+                if (moduleIndex === 2 && state.offerData) {
+                    renderOfferCompany(state.offerData);
+                }
             });
         });
 
@@ -2508,6 +2573,8 @@
             document.getElementById('offerOutlookSection').style.display = 'none';
             document.getElementById('offerSuggestionDivider').style.display = 'none';
             document.getElementById('offerSuggestionSection').style.display = 'none';
+            document.getElementById('offerCompanyDivider').style.display = 'none';
+            document.getElementById('offerCompanySection').style.display = 'none';
 
             try {
                 const result = await apiPost('/api/offer/analyze', { offerTexts });
@@ -2515,57 +2582,9 @@
                 renderOfferTable(result);
                 renderOfferOutlook(result);
                 renderOfferSuggestions(result);
+                renderOfferCompany(result);
             } catch (err) {
                 document.getElementById('offerTableContainer').innerHTML = '<p class="placeholder-hint">分析失败：' + escapeHtml(err.message) + '</p>';
-            }
-        }
-
-        // ======== 手动填写后分析（仅更新前景和建议） ========
-        async function analyzeManualData() {
-            const text = offersToText();
-            if (!text) {
-                alert('请先在表格中填写Offer信息');
-                return;
-            }
-
-            const btn = document.querySelector('.offer-analyze-btn');
-            const origText = btn.textContent;
-            btn.textContent = '分析中...';
-            btn.disabled = true;
-
-            try {
-                const result = await apiPost('/api/offer/analyze', { offerTexts: [text] });
-                // Only update outlook and suggestion, keep user's table data
-                if (result.outlook) state.offerData.outlook = result.outlook;
-                if (result.suggestion) state.offerData.suggestion = result.suggestion;
-                // Merge API-extracted fields into user's offers if API returns better data
-                if (result.offers && result.offers.length) {
-                    result.offers.forEach((apiOffer, i) => {
-                        if (!state.offerData.offers[i]) return;
-                        const userOffer = state.offerData.offers[i];
-                        // Only fill empty fields, don't overwrite user's manual input
-                        if (!userOffer.company && apiOffer.company) userOffer.company = apiOffer.company;
-                        if (!userOffer.position && apiOffer.position) userOffer.position = apiOffer.position;
-                        if (!userOffer.location && apiOffer.location) userOffer.location = apiOffer.location;
-                        if ((userOffer.annualPackage == null) && apiOffer.annualPackage) userOffer.annualPackage = apiOffer.annualPackage;
-                        if ((userOffer.monthlySalary == null) && apiOffer.monthlySalary) userOffer.monthlySalary = apiOffer.monthlySalary;
-                        if (!userOffer.workSchedule && apiOffer.workSchedule) userOffer.workSchedule = apiOffer.workSchedule;
-                        if ((userOffer.dailyWorkHours == null) && apiOffer.dailyWorkHours) userOffer.dailyWorkHours = apiOffer.dailyWorkHours;
-                        if (!userOffer.insuranceBase && apiOffer.insuranceBase) userOffer.insuranceBase = apiOffer.insuranceBase;
-                        if ((userOffer.housingFundMonthly == null) && apiOffer.housingFundMonthly) userOffer.housingFundMonthly = apiOffer.housingFundMonthly;
-                        if (!userOffer.bonus && apiOffer.bonus) userOffer.bonus = apiOffer.bonus;
-                        if (!userOffer.resumeValue && apiOffer.resumeValue) userOffer.resumeValue = apiOffer.resumeValue;
-                        if ((userOffer.hourlyRate == null) && apiOffer.hourlyRate) userOffer.hourlyRate = apiOffer.hourlyRate;
-                    });
-                }
-                renderOfferTable(state.offerData);
-                renderOfferOutlook(state.offerData);
-                renderOfferSuggestions(state.offerData);
-            } catch (err) {
-                alert('分析失败：' + err.message);
-            } finally {
-                btn.textContent = origText;
-                btn.disabled = false;
             }
         }
 
@@ -2714,6 +2733,27 @@
             }
         }
 
+        // ======== 企业背景渲染 ========
+        function renderOfferCompany(data) {
+            if (!data || !data.offers) return;
+            const cards = data.offers.filter(o => o.companyBackground).map((o, i) => {
+                const bg = o.companyBackground;
+                const rows = [];
+                if (bg.industry) rows.push('<div class="company-bg-row"><span class="company-bg-label">行业</span><span class="company-bg-value">' + escapeHtml(bg.industry) + '</span></div>');
+                if (bg.scale) rows.push('<div class="company-bg-row"><span class="company-bg-label">规模</span><span class="company-bg-value">' + escapeHtml(bg.scale) + '</span></div>');
+                if (bg.stage) rows.push('<div class="company-bg-row"><span class="company-bg-label">阶段</span><span class="company-bg-value">' + escapeHtml(bg.stage) + '</span></div>');
+                if (bg.overview) rows.push('<div class="company-bg-row"><span class="company-bg-label">业务</span><span class="company-bg-value">' + escapeHtml(bg.overview) + '</span></div>');
+                if (bg.culture) rows.push('<div class="company-bg-row"><span class="company-bg-label">文化</span><span class="company-bg-value">' + escapeHtml(bg.culture) + '</span></div>');
+                if (bg.recentNews) rows.push('<div class="company-bg-row"><span class="company-bg-label">动态</span><span class="company-bg-value">' + escapeHtml(bg.recentNews) + '</span></div>');
+                return '<div class="company-card"><div class="company-name">' + escapeHtml(o.company || 'Offer ' + (i + 1)) + '</div>' + rows.join('') + '</div>';
+            }).join('');
+            if (cards) {
+                document.getElementById('offerCompanyContent').innerHTML = cards;
+                document.getElementById('offerCompanyDivider').style.display = 'block';
+                document.getElementById('offerCompanySection').style.display = 'block';
+            }
+        }
+
         // ======== Offer 表格编辑同步 ========
         const offerTable = document.getElementById('offerTableContainer');
         offerTable.addEventListener('input', (e) => {
@@ -2765,6 +2805,7 @@
             renderOfferTable(state.offerData);
             renderOfferOutlook(state.offerData);
             renderOfferSuggestions(state.offerData);
+            renderOfferCompany(state.offerData);
         }
 
         // ======== 初始化空白表格 ========
