@@ -429,6 +429,18 @@
             height: 20px;
         }
 
+        .chat-send-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .chat-input:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            background: #f5f5f5;
+        }
+
         /* ======== 匹配度分值 ======== */
         .match-score-section {
             text-align: center;
@@ -1030,8 +1042,12 @@
         .compact-upload {
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 28px 20px;
-            text-align: center;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             cursor: pointer;
             transition: all 0.25s ease;
         }
@@ -1039,6 +1055,154 @@
         .compact-upload:hover {
             border-color: var(--accent);
             background: rgba(11, 87, 208, 0.02);
+        }
+
+        /* ======== 面试信息可编辑字段 ======== */
+        .info-value {
+            color: var(--text);
+            font-weight: 500;
+            white-space: nowrap;
+            text-align: right;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            outline: none;
+            border-radius: 4px;
+            padding: 1px 6px;
+            transition: all 0.2s ease;
+        }
+
+        .info-value.editable {
+            border-bottom: 1.5px dashed transparent;
+            cursor: text;
+        }
+
+        .info-value.editable:hover {
+            border-bottom-color: var(--border);
+            background: rgba(11, 87, 208, 0.03);
+        }
+
+        .info-value.editable:focus {
+            border-bottom-color: var(--accent);
+            background: rgba(11, 87, 208, 0.05);
+            white-space: normal;
+            text-overflow: clip;
+        }
+
+        .info-value.unknown {
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        /* ======== 面试预测按钮 ======== */
+        .predict-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 24px;
+            border: 1.5px solid var(--accent);
+            background: #fff;
+            color: var(--accent);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+
+        .predict-btn:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .predict-btn:active {
+            transform: scale(0.97);
+        }
+
+        .predict-btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .predict-btn .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .start-interview-btn {
+            width: 100%;
+            padding: 12px 0;
+            border-radius: 12px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+
+        .start-interview-btn:hover {
+            background: #0952B5;
+            box-shadow: 0 4px 16px rgba(11, 87, 208, 0.3);
+        }
+
+        .start-interview-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* ======== 预测题列表 ======== */
+        .question-item {
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+            transition: all 0.2s ease;
+            cursor: default;
+        }
+
+        .question-item:hover {
+            border-color: var(--accent);
+            background: rgba(11, 87, 208, 0.02);
+        }
+
+        .question-item .q-cat {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .q-cat.behavioral { background: #EEF2FF; color: #4A5ECD; }
+        .q-cat.technical { background: #FFF3E0; color: #E67E22; }
+        .q-cat.project { background: #E8F5E9; color: #2E7D32; }
+
+        .question-item .q-text {
+            color: var(--text);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .question-item .q-reason {
+            color: var(--text-tertiary);
+            font-size: 12px;
+        }
+
+        .question-item .q-num {
+            color: var(--text-tertiary);
+            font-size: 11px;
+            margin-right: 4px;
+            font-weight: 600;
         }
 
         /* ======== 模块容器 ======== */
@@ -1243,7 +1407,7 @@
                                 <line x1="5" y1="12" x2="19" y2="12"/>
                             </svg>
                         </div>
-                        <span class="upload-text">点击上传岗位JD (图片/PDF)</span>
+                        <span class="upload-text">点击上传岗位JD (图片/PDF/TXT)</span>
                     </div>
                 </div>
 
@@ -1325,13 +1489,13 @@
                         <div class="chat-message ai">
                             <div class="chat-avatar">AI</div>
                             <div class="chat-bubble">
-                                你好！我是你的AI面试教练。请上传你的<strong>简历</strong>和<strong>目标岗位JD</strong>到右侧面板，我将为你生成针对性的模拟面试题。<br><br>你也可以直接告诉我目标岗位，我们可以立即开始练习。
+                                你好！我是你的AI面试教练。请先在右侧面板上传你的<strong>简历</strong>和<strong>目标岗位JD</strong>，上传完成后即可生成预测面试题并开始模拟练习。
                             </div>
                         </div>
                     </div>
-                    <div class="chat-input-area">
-                        <textarea class="chat-input" placeholder="输入你的回答..." rows="1" id="chatInput1"></textarea>
-                        <button class="chat-send-btn" onclick="sendMessage(1)">
+                    <div class="chat-input-area" id="chatInputArea1">
+                        <textarea class="chat-input" placeholder="请先上传简历和岗位JD，上传完成后即可开始面试模拟" rows="1" id="chatInput1" disabled></textarea>
+                        <button class="chat-send-btn" onclick="sendMessage(1)" disabled>
                             <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
                                 <line x1="12" y1="19" x2="12" y2="5"/>
                                 <polyline points="5 12 12 5 19 12"/>
@@ -1363,28 +1527,51 @@
                                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                             </svg>
                         </div>
-                        <span class="upload-text" style="font-size:14px;">点击上传岗位JD (图片/PDF)</span>
+                        <span class="upload-text" style="font-size:14px;">点击上传岗位JD (图片/PDF/TXT)</span>
                     </div>
                 </div>
 
                 <hr class="divider">
 
-                <div>
+                <div id="interviewInfo">
                     <p class="panel-section-title">面试信息</p>
                     <div style="font-size:14px;color:var(--text-secondary);line-height:2;margin-top:8px;">
-                        <div style="display:flex;justify-content:space-between;">
-                            <span style="white-space:nowrap;">目标公司</span><span style="color:var(--text);font-weight:500;white-space:nowrap;">字节跳动</span>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="white-space:nowrap;">目标公司</span>
+                            <span class="info-value editable" id="infoCompany" contenteditable="true">--</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="white-space:nowrap;">目标岗位</span>
+                            <span class="info-value editable" id="infoPosition" contenteditable="true">--</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="white-space:nowrap;">面试轮次</span>
+                            <span class="info-value editable" id="infoRound" contenteditable="true">--</span>
                         </div>
                         <div style="display:flex;justify-content:space-between;">
-                            <span style="white-space:nowrap;">目标岗位</span><span style="color:var(--text);font-weight:500;white-space:nowrap;">高级产品经理</span>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;">
-                            <span style="white-space:nowrap;">面试轮次</span><span style="color:var(--text);font-weight:500;white-space:nowrap;">一面 · 业务面</span>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;">
-                            <span style="white-space:nowrap;">已练习</span><span style="color:var(--accent);font-weight:600;white-space:nowrap;">3 题</span>
+                            <span style="white-space:nowrap;">已练习</span><span style="color:var(--accent);font-weight:600;white-space:nowrap;" id="infoProgress">0 题</span>
                         </div>
                     </div>
+                </div>
+
+                <div id="predictAction" style="text-align:center;padding:16px 0 8px;display:none;">
+                    <button class="predict-btn" id="btnPredict" onclick="predictQuestions()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                        生成预测面试题
+                    </button>
+                </div>
+
+                <div id="predictQuestionList" style="display:none;">
+                    <p class="panel-section-title">预测面试题</p>
+                    <div id="questionListContent"></div>
+                </div>
+
+                <div id="startInterviewAction" style="text-align:center;padding:12px 0;display:none;">
+                    <button class="start-interview-btn" id="btnStartInterview" onclick="startInterview()">
+                        开始模拟面试
+                    </button>
                 </div>
             </div>
         </div>
@@ -1499,9 +1686,9 @@
 
     <!-- 隐藏的文件上传input -->
     <input type="file" id="fileResume" accept=".pdf" style="display:none;">
-    <input type="file" id="fileJD" accept=".png,.jpg,.jpeg,.webp,.bmp,.pdf" style="display:none;">
+    <input type="file" id="fileJD" accept=".png,.jpg,.jpeg,.webp,.bmp,.pdf,.txt" style="display:none;">
     <input type="file" id="fileInterviewResume" accept=".pdf" style="display:none;">
-    <input type="file" id="fileInterviewJD" accept=".png,.jpg,.jpeg,.webp,.bmp,.pdf" style="display:none;">
+    <input type="file" id="fileInterviewJD" accept=".png,.jpg,.jpeg,.webp,.bmp,.pdf,.txt" style="display:none;">
 
     <script>
         // ======== 状态管理 ========
@@ -1514,6 +1701,8 @@
             chatHistory2: [],
             isAnalyzing: false,
             isOptimizing: false,
+            interviewPredict: null,
+            practicedCount: 0,
         };
 
         // ======== API 工具函数 ========
@@ -1593,6 +1782,14 @@
                         if (state.resumeText && state.jdText && !state.isAnalyzing) {
                             await analyzeResume();
                         }
+                    }
+
+                    // Show predict button in interview module when both files uploaded
+                    if (typeKey === 'interviewResume' || typeKey === 'interviewJD') {
+                        if (state.resumeText && state.jdText) {
+                            document.getElementById('predictAction').style.display = 'block';
+                        }
+                        checkInterviewReady();
                     }
                 } catch (err) {
                     zone.innerHTML = origHTML;
@@ -1871,6 +2068,16 @@
                 // 更新模块显示
                 modules.forEach(m => m.classList.remove('active'));
                 modules[moduleIndex].classList.add('active');
+
+                // 切换到面试模块时恢复预测状态 + 检查输入框
+                if (moduleIndex === 1) {
+                    checkInterviewReady();
+                    if (state.interviewPredict) {
+                        document.getElementById('predictAction').style.display = 'none';
+                        document.getElementById('predictQuestionList').style.display = 'block';
+                        document.getElementById('startInterviewAction').style.display = 'block';
+                    }
+                }
             });
         });
 
@@ -1920,6 +2127,11 @@
             const text = input.value.trim();
             if (!text) return;
 
+            // Block sending in interview module if files not uploaded
+            if (moduleNum === 1 && (!state.resumeText || !state.jdText)) {
+                return;
+            }
+
             // Add user message
             addChatMessage(moduleNum, 'user', escapeHtml(text));
 
@@ -1954,6 +2166,11 @@
                 const replyHTML = result.reply.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                 addChatMessage(moduleNum, 'ai', replyHTML);
                 state[historyKey].push({ role: 'assistant', content: result.reply });
+
+                // Track interview progress
+                if (moduleNum === 1 && state.interviewPredict) {
+                    updateInterviewProgress();
+                }
             } catch (err) {
                 removeLoadingBubble();
                 addChatMessage(moduleNum, 'ai', '抱歉，请求失败：' + err.message);
@@ -1966,6 +2183,131 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // ======== 面试问答就绪检查 ========
+        function checkInterviewReady() {
+            const input = document.getElementById('chatInput1');
+            const sendBtn = document.querySelector('#chatInputArea1 .chat-send-btn');
+            const ready = state.resumeText && state.jdText;
+
+            if (input) {
+                input.disabled = !ready;
+                input.placeholder = ready ? '输入你的回答...' : '请先上传简历和岗位JD，上传完成后即可开始面试模拟';
+            }
+            if (sendBtn) sendBtn.disabled = !ready;
+        }
+
+        // ======== 面试题预测 ========
+        async function predictQuestions() {
+            if (!state.resumeText || !state.jdText) return;
+
+            const btn = document.getElementById('btnPredict');
+            const origHTML = btn.innerHTML;
+            btn.classList.add('loading');
+            btn.innerHTML = '<span class="btn-spinner"></span>正在分析简历与JD...';
+
+            try {
+                const result = await apiPost('/api/interview/predict', {
+                    resumeText: state.resumeText,
+                    jdText: state.jdText,
+                });
+                state.interviewPredict = result;
+                state.practicedCount = 0;
+                renderPredictResult(result);
+                document.getElementById('predictAction').style.display = 'none';
+                document.getElementById('predictQuestionList').style.display = 'block';
+                document.getElementById('startInterviewAction').style.display = 'block';
+            } catch (err) {
+                alert('预测失败：' + err.message);
+                btn.classList.remove('loading');
+                btn.innerHTML = origHTML;
+            }
+        }
+
+        function renderPredictResult(data) {
+            // Helper: detect if value is unknown/generic
+            function isUnknown(val) {
+                if (!val || !val.trim()) return true;
+                const v = val.trim();
+                const vague = ['未提及', '未明确', '未注明', '暂未提及', '未知', '不详', '待确认', '未提供'];
+                return vague.includes(v);
+            }
+
+            function setInfoField(id, value) {
+                const el = document.getElementById(id);
+                if (isUnknown(value)) {
+                    el.textContent = '未知';
+                    el.classList.add('unknown');
+                } else {
+                    el.textContent = value.trim();
+                    el.classList.remove('unknown');
+                }
+            }
+
+            setInfoField('infoCompany', data.company);
+            setInfoField('infoPosition', data.position);
+            setInfoField('infoRound', data.round);
+            document.getElementById('infoProgress').textContent = '0 / ' + (data.totalCount || data.questions.length) + ' 题';
+
+            // Render question list
+            const container = document.getElementById('questionListContent');
+            const catMap = { '行为面试': 'behavioral', '技术能力': 'technical', '项目经验': 'project' };
+            container.innerHTML = (data.questions || []).map(q => `
+                <div class="question-item">
+                    <span class="q-num">Q${q.id}</span>
+                    <span class="q-cat ${catMap[q.category] || 'behavioral'}">${q.category}</span>
+                    <div class="q-text">${escapeHtml(q.question)}</div>
+                    <div class="q-reason">考察点：${escapeHtml(q.reason)}</div>
+                </div>
+            `).join('');
+        }
+
+        async function startInterview() {
+            if (!state.interviewPredict || !state.interviewPredict.questions) return;
+
+            const questions = state.interviewPredict.questions;
+            if (questions.length === 0) return;
+
+            // Build a structured prompt to start the interview
+            const qList = questions.map((q, i) => `${i + 1}. [${q.category}] ${q.question}`).join('\n');
+            const startMsg = `以下是预测的面试题列表，请以毒舌面试官身份，从第1题开始提问。\n\n预测面试题：\n${qList}`;
+
+            // Add as user message and trigger send
+            addChatMessage(1, 'user', '开始模拟面试');
+            state.chatHistory1.push({ role: 'user', content: startMsg });
+
+            // Show loading and call API
+            addLoadingBubble(1);
+            const sendBtn = document.querySelector('#chatInput1').parentElement.querySelector('.chat-send-btn');
+            if (sendBtn) sendBtn.disabled = true;
+
+            try {
+                const result = await apiPost('/api/interview/chat', {
+                    messages: [{ role: 'user', content: startMsg }],
+                    resumeText: state.resumeText,
+                    jdText: state.jdText,
+                });
+
+                removeLoadingBubble();
+                const replyHTML = result.reply.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                addChatMessage(1, 'ai', replyHTML);
+                state.chatHistory1.push({ role: 'assistant', content: result.reply });
+
+                document.getElementById('startInterviewAction').style.display = 'none';
+            } catch (err) {
+                removeLoadingBubble();
+                addChatMessage(1, 'ai', '抱歉，请求失败：' + err.message);
+            } finally {
+                if (sendBtn) sendBtn.disabled = false;
+            }
+        }
+
+        function updateInterviewProgress() {
+            if (!state.interviewPredict) return;
+            state.practicedCount++;
+            const total = state.interviewPredict.totalCount || state.interviewPredict.questions.length;
+            document.getElementById('infoProgress').textContent = state.practicedCount + ' / ' + total + ' 题';
         }
 
         // ======== 输入框自动调整高度 ========
@@ -1993,6 +2335,9 @@
         // ======== 初始化对话历史（AI开场白） ========
         state.chatHistory1 = [];
         state.chatHistory2 = [];
+
+        // 初始化面试模块输入状态
+        checkInterviewReady();
     </script>
 </body>
 </html>
