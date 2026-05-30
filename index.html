@@ -2143,6 +2143,7 @@
     <script>
     // ======== 粒子特效系统 ========
     (function() {
+        try {
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
         const hero = document.getElementById('particleHero');
@@ -2182,8 +2183,11 @@
 
         function getTextPositions(text) {
             const area = getHeroRect();
-            const offW = Math.max(area.w, 400);
-            const offH = Math.max(area.h, 80);
+            // Clamp to canvas bounds to prevent IndexSizeError
+            const maxW = canvas.width - area.x;
+            const maxH = canvas.height - area.y;
+            const offW = Math.min(Math.max(area.w, 400), Math.max(maxW, 1));
+            const offH = Math.min(Math.max(area.h, 80), Math.max(maxH, 1));
 
             // Return cached positions if area dimensions approximately match
             // (tolerates scrollbar-induced width changes of up to 30px)
@@ -2605,9 +2609,23 @@
             mouseY = -1000;
         });
 
-        document.fonts.ready.then(() => {
+        // Init when fonts are ready, with a timeout fallback
+        let particleStarted = false;
+        function startParticles() {
+            if (particleStarted) return;
+            particleStarted = true;
             requestAnimationFrame(() => init());
+        }
+        document.fonts.ready.then(startParticles);
+        // Fallback: if fonts.ready doesn't fire within 2s, start anyway
+        setTimeout(startParticles, 2000);
+        // Also start on window load as a safety net
+        window.addEventListener('load', function() {
+            setTimeout(startParticles, 500);
         });
+        } catch (e) {
+            console.error('Particle effect init error:', e);
+        }
     })();
     </script>
 </body>
