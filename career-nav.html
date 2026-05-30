@@ -55,20 +55,18 @@
         .sidebar-logo {
             padding: 0 24px;
             margin-bottom: 60px;
-            font-size: 22px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--text);
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .sidebar-logo .logo-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--accent);
+        .sidebar-logo .logo-icon {
+            width: 30px;
+            height: 30px;
             flex-shrink: 0;
         }
 
@@ -1886,7 +1884,7 @@
             .sidebar-logo {
                 margin-bottom: 0;
                 margin-right: 16px;
-                font-size: 18px;
+                font-size: 16px;
             }
 
             .sidebar-nav {
@@ -1938,7 +1936,10 @@
     <!-- ======== 左侧边栏 ======== -->
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <span class="logo-dot"></span>
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="var(--accent)"/>
+            </svg>
             职途导航
         </div>
         <nav class="sidebar-nav">
@@ -2295,7 +2296,7 @@
 
     <script>
         // ======== 状态管理 ========
-        const API_BASE = 'http://localhost:3000';
+        const API_BASE = '';
         const state = {
             resumeText: '',
             jdText: '',
@@ -2312,6 +2313,20 @@
             lastAnalysis: null,
             optimizeReport: null,
         };
+
+        // ======== 数据埋点 ========
+        function getCurrentUser() {
+            const user = loadUser();
+            return user.loggedIn ? user.email : '';
+        }
+
+        function trackEvent(type, data) {
+            apiPost('/api/analytics/track', {
+                type,
+                email: getCurrentUser(),
+                data
+            }).catch(() => {}); // fire-and-forget
+        }
 
         // ======== API 工具函数 ========
         async function apiPost(endpoint, data) {
@@ -2647,6 +2662,7 @@
                 // Strip 【】 markers for clean copy
                 const cleanText = state.optimizedResumeText.replace(/【|】/g, '');
                 await navigator.clipboard.writeText(cleanText);
+                trackEvent('copy', {});
                 const btn = document.querySelector('.copy-btn');
                 btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`;
                 btn.classList.add('copied');
@@ -2665,9 +2681,11 @@
             if (type === 'up') {
                 upBtn.classList.toggle('active');
                 downBtn.classList.remove('active');
+                trackEvent('thumb_up', {});
             } else {
                 downBtn.classList.toggle('active');
                 upBtn.classList.remove('active');
+                trackEvent('thumb_down', {});
             }
         }
 
@@ -2686,6 +2704,9 @@
                 // 更新模块显示
                 modules.forEach(m => m.classList.remove('active'));
                 modules[moduleIndex].classList.add('active');
+
+                const moduleNames = ['resume', 'interview', 'offer'];
+                trackEvent('module_view', { module: moduleNames[moduleIndex] });
 
                 // 切换到面试模块时恢复预测状态 + 检查输入框
                 if (moduleIndex === 1) {
@@ -3669,6 +3690,7 @@
                 saveUser({ email, loggedIn: true });
                 renderUser();
                 closeLogin();
+                trackEvent('login', { email });
             } catch (err) {
                 alert('验证失败：' + err.message);
             }

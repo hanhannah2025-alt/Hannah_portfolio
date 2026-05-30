@@ -9,6 +9,9 @@ const OpenAI = require('openai');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Serve static frontend files (disable default index.html)
+app.use(express.static(__dirname, { index: false }));
+
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
@@ -559,9 +562,90 @@ app.post('/api/verify-code', (req, res) => {
   res.json({ success: true });
 });
 
+// ======== Analytics ========
+const ANALYTICS_FILE = path.join(__dirname, 'analytics.json');
+
+function loadAnalytics() {
+  try { return JSON.parse(fs.readFileSync(ANALYTICS_FILE, 'utf-8')); }
+  catch (e) { return { events: [], users: {} }; }
+}
+
+function saveAnalytics(data) {
+  fs.writeFileSync(ANALYTICS_FILE, JSON.stringify(data, null, 2));
+}
+
+app.post('/api/analytics/track', (req, res) => {
+  try {
+    const { type, email, data: eventData } = req.body;
+    if (!type) return res.status(400).json({ error: '缺少事件类型' });
+    const analytics = loadAnalytics();
+    const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+    const event = {
+      id: analytics.events.length + 1,
+      type,
+      user: email || 'anonymous',
+      ip: ip.replace(/^::ffff:/, ''),
+      data: eventData || {},
+      timestamp: new Date().toISOString()
+    };
+    analytics.events.push(event);
+    // Keep last 10000 events
+    if (analytics.events.length > 10000) analytics.events = analytics.events.slice(-10000);
+
+    // Update user stats
+    if (email) {
+      if (!analytics.users[email]) {
+        analytics.users[email] = { firstSeen: new Date().toISOString(), loginCount: 0, events: 0 };
+      }
+      analytics.users[email].lastSeen = new Date().toISOString();
+      analytics.users[email].events = (analytics.users[email].events || 0) + 1;
+      if (type === 'login') analytics.users[email].loginCount = (analytics.users[email].loginCount || 0) + 1;
+    }
+
+    saveAnalytics(analytics);
+    res.json({ success: true, eventId: event.id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/analytics/stats', (req, res) => {
+  try {
+    const analytics = loadAnalytics();
+    const totalEvents = analytics.events.length;
+    const totalUsers = Object.keys(analytics.users).length;
+    // Recent 7 days
+    const weekAgo = Date.now() - 7 * 24 * 3600 * 1000;
+    const recentEvents = analytics.events.filter(e => new Date(e.timestamp).getTime() > weekAgo);
+    const eventTypes = {};
+    recentEvents.forEach(e => { eventTypes[e.type] = (eventTypes[e.type] || 0) + 1; });
+    // Copy, thumbs up/down counts
+    const feedbackStats = {
+      copy: analytics.events.filter(e => e.type === 'copy').length,
+      thumbUp: analytics.events.filter(e => e.type === 'thumb_up').length,
+      thumbDown: analytics.events.filter(e => e.type === 'thumb_down').length,
+    };
+    res.json({
+      totalUsers,
+      totalEvents,
+      recent7d: recentEvents.length,
+      eventTypes,
+      feedback: feedbackStats,
+      users: Object.entries(analytics.users).map(([email, u]) => ({ email, ...u }))
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', model: MODEL });
+});
+
+// Serve career-nav.html at root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'career-nav.html'));
 });
 
 app.listen(PORT, () => {
